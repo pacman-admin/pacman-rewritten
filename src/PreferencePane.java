@@ -1,0 +1,3 @@
+class PreferencePane extends Window {
+
+}

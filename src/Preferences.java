@@ -1,7 +1,8 @@
 import java.io.*;
-
+import java.util.logging.Logger;
 
 class Preferences {
+    private static final Logger LOGGER = Logger.getLogger(Preferences.class.getName());
     static boolean autoUpdate = true;
     static boolean debug = true;
     static boolean mute = false;
@@ -9,25 +10,40 @@ class Preferences {
     static int scale = 1;
 
     static void load() {
-        //path = System.getProperty("user.home");
         try {
-            DataInputStream din = new DataInputStream(new BufferedInputStream(new FileInputStream(path + "/dat")));
-            debug = din.readBoolean();
+            ObjectInputStream oIS = new ObjectInputStream(new FileInputStream(PacStatic.path + "/PacPreferences.dat"));
+            Container savedSettings = (Container) oIS.readObject();
+            //Container savedSettings = new Container();
+            autoUpdate = savedSettings.autoUpdate;
+            debug = savedSettings.debug;
+            mute = savedSettings.mute;
+            playPauseBeat = savedSettings.playPauseBeat;
+            scale = savedSettings.scale;
+            oIS.close();
         } catch (IOException e) {
-            System.err.println("An Error occurred while loading.");
+            LOGGER.warning("Could not load settings. Perhaps the file does not exist.");
             save();
+        } catch (ClassNotFoundException e) {
+            LOGGER.severe("Encountered an unexpected ClassNotFoundException while attempting to load Preferences from disk.");
         }
     }
 
     static void save() {
         try {
-            DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(path + "/dat")));
-            dos.writeBoolean(debug);
-            dos.writeBoolean(playPauseBeat);
-            dos.close();
-        } catch (IOException ee) {
-            System.err.println("An Error occurred while saving settings.");
+            ObjectOutputStream oOS = new ObjectOutputStream(new FileOutputStream(PacStatic.path + "/PacPreferences.dat"));
+            oOS.writeObject(new Container());
+            oOS.close();
+        } catch (IOException e) {
+            LOGGER.warning("Could not save Preferences to disk. Perhaps your home directory (~) is not writable?");
+            LOGGER.warning(e.toString());
         }
     }
 
+    private final static class Container implements Serializable {
+        private final boolean autoUpdate = Preferences.autoUpdate;
+        private final boolean debug = Preferences.debug;
+        private final boolean mute = Preferences.mute;
+        private final boolean playPauseBeat = Preferences.playPauseBeat;
+        private final int scale = Preferences.scale;
+    }
 }
