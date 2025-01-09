@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.logging.Logger;
 
 class Preferences {
-    private static final Logger LOGGER = Logger.getLogger(Preferences.class.getName());
+    private static final Logger LOGGER = LoggerFactory.createLogger(Preferences.class.getName());
     static boolean autoUpdate = true;
     static boolean debug = true;
     static boolean mute = false;

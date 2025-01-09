@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import static java.lang.Float.parseFloat;
 
 final class UpdateMgr {
-    private static final Logger LOGGER = Logger.getLogger(UpdateMgr.class.getName());
+    private static final Logger LOGGER = LoggerFactory.createLogger(UpdateMgr.class.getName());
     private static float latestVersion = 14f;
 
     static void checkForUpdate() {
@@ -19,7 +19,7 @@ final class UpdateMgr {
             latestVersion = parseFloat(in.readLine());
             in.close();
         } catch (IOException e) {
-            LOGGER.warning("Encountered an IOException while checking for update. Please check your internet connection.");
+            LOGGER.warning("Encountered an IOException while checking for an update. Please check your internet connection.");
             LOGGER.warning(e.toString());
             return;
         } catch (URISyntaxException e) {
@@ -33,7 +33,7 @@ final class UpdateMgr {
         }
     }
 
-    public static boolean updateAvailable(){
+    public static boolean updateAvailable() {
         return latestVersion > PacStatic.myVersion;
     }
 

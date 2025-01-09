@@ -2,32 +2,58 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Logger;
 
 abstract class Window extends JPanel implements ActionListener/*, ItemListener*/ {
-    /*static void open(){
-        javax.swing.SwingUtilities.invokeLater(Window::createWindow(new PreferencePane()));
+    private static final Logger LOGGER = LoggerFactory.createLogger(Window.class.getName());
+    private final static JLabel INFO = new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca");
+    private final static JLabel COPYRIGHT = new JLabel("Copyright © 2025 Langdon Staab");
+    String title;
+
+    Window() {
+        super(new BorderLayout());
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                 UnsupportedLookAndFeelException e) {
+            LOGGER.warning("Error while setting theme to system theme." + e);
+            //ex.printStackTrace();
+        }
+        LOGGER.info("Successfully set theme to system theme.");
     }
-    private static void createWindow(Window what){
-        JFrame frame = new JFrame("Settings");
-        /*frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);*/
-    /*Create and set up the content pane.*/
-       /* what.setOpaque(true);
-        /*content panes must be opaque*/
-    //frame.setContentPane(what);
-    /*Display the Window.*/
-        /*frame.pack();
+
+    static void init(Window what) {
+        final JFrame frame = new JFrame(what.title);
+        what.realInit();
+        frame.setContentPane(what);
+        frame.pack();
         frame.setVisible(true);
-    }*/
-    static JButton createButton(String title, int key, Window window, String command) {
-        final JButton button = new JButton(title);
-        button.setMnemonic(key);
-        button.setEnabled(true);
-        button.setActionCommand(command);
-        button.addActionListener(window);
-        return button;
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    abstract void main(JPanel panel);
+
+    private void realInit() {
+        LOGGER.info("Opening " + title + "...");
+        final JPanel infoPanel = new JPanel(new GridLayout(0, 1));
+        main(infoPanel);
+        infoPanel.add(createButton("Donate", KeyEvent.VK_D, "donate"));
+        infoPanel.add(INFO);
+        infoPanel.add(COPYRIGHT);
+        add(infoPanel, BorderLayout.LINE_START);
+        //setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    }
+
+    final JButton createButton(String text, int key, String command) {
+        final JButton b = new JButton(text);
+        b.setMnemonic(key);
+        b.setActionCommand(command);
+        b.addActionListener(this);
+        return b;
     }
 
     public void actionPerformed(ActionEvent e) {
