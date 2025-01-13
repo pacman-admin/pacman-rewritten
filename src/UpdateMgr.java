@@ -27,14 +27,14 @@ final class UpdateMgr {
             LOGGER.warning(e.toString());
             return;
         }
-        if (PacStatic.myVersion < latestVersion) {
+        if (PacStatic.VERSION < latestVersion) {
             LOGGER.info("An update is available!");
             //create update window
         }
     }
 
     public static boolean updateAvailable() {
-        return latestVersion > PacStatic.myVersion;
+        return latestVersion > PacStatic.VERSION;
     }
 
     public static float getLatestVersion() {

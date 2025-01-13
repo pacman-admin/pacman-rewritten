@@ -11,7 +11,7 @@ class Preferences {
 
     static void load() {
         try {
-            ObjectInputStream oIS = new ObjectInputStream(new FileInputStream(PacStatic.path + "/PacPreferences.dat"));
+            ObjectInputStream oIS = new ObjectInputStream(new FileInputStream(PacStatic.PATH + "/PacPreferences.dat"));
             Container savedSettings = (Container) oIS.readObject();
             //Container savedSettings = new Container();
             autoUpdate = savedSettings.autoUpdate;
@@ -30,7 +30,7 @@ class Preferences {
 
     static void save() {
         try {
-            ObjectOutputStream oOS = new ObjectOutputStream(new FileOutputStream(PacStatic.path + "/PacPreferences.dat"));
+            ObjectOutputStream oOS = new ObjectOutputStream(new FileOutputStream(PacStatic.PATH + "/PacPreferences.dat"));
             oOS.writeObject(new Container());
             oOS.close();
         } catch (IOException e) {

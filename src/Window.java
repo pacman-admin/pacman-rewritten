@@ -12,8 +12,7 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
     private static final Logger LOGGER = LoggerFactory.createLogger(Window.class.getName());
     private final static JLabel INFO = new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca");
     private final static JLabel COPYRIGHT = new JLabel("Copyright © 2025 Langdon Staab");
-    String title;
-
+    String title = "Empty Window";
     Window() {
         super(new BorderLayout());
         try {
@@ -40,7 +39,9 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
     private void realInit() {
         LOGGER.info("Opening " + title + "...");
         final JPanel infoPanel = new JPanel(new GridLayout(0, 1));
+        LOGGER.info("Creating UI...");
         main(infoPanel);
+        infoPanel.add(createButton("About Pac-Man", KeyEvent.VK_A, "about"));
         infoPanel.add(createButton("Donate", KeyEvent.VK_D, "donate"));
         infoPanel.add(INFO);
         infoPanel.add(COPYRIGHT);
@@ -63,8 +64,8 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
                     //UpdatePrompt.create();
                 }
                 break;
-            case "launchAbout":
-                //AboutWindow.open();
+            case "about":
+                InfoPane.launch();
                 break;
             case "donate":
                 try {
