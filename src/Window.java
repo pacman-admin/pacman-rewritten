@@ -1,17 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-abstract class Window extends JPanel implements ActionListener/*, ItemListener*/ {
+abstract class Window extends JPanel implements ActionListener{
     private static final Logger LOGGER = LoggerFactory.createLogger(Window.class.getName());
-    private final static JLabel INFO = new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca");
-    private final static JLabel COPYRIGHT = new JLabel("Copyright © 2025 Langdon Staab");
     String title = "Empty Window";
 
     Window() {
@@ -21,7 +17,6 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                  UnsupportedLookAndFeelException e) {
             LOGGER.warning("Error while setting theme to system theme." + e);
-            //ex.printStackTrace();
         }
         LOGGER.info("Successfully set theme to system theme.");
     }
@@ -32,7 +27,6 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
         frame.setContentPane(what);
         frame.pack();
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     abstract void main(JPanel panel);
@@ -44,11 +38,14 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
         main(infoPanel);
         infoPanel.add(createButton("About Pac-Man", KeyEvent.VK_A, "about"));
         infoPanel.add(createButton("Donate", KeyEvent.VK_D, "donate"));
-        infoPanel.add(INFO);
-        infoPanel.add(COPYRIGHT);
+        infoPanel.add(new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca"));
+        infoPanel.add(new JLabel("Copyright © 2025 Langdon Staab"));
         add(infoPanel, BorderLayout.LINE_START);
         //setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
+
+
+
 
     final JButton createButton(String text, int key, String command) {
         final JButton b = new JButton(text);
@@ -57,6 +54,7 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
         b.addActionListener(this);
         return b;
     }
+
 
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
