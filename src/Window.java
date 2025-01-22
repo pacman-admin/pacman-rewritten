@@ -13,6 +13,7 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
     private final static JLabel INFO = new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca");
     private final static JLabel COPYRIGHT = new JLabel("Copyright © 2025 Langdon Staab");
     String title = "Empty Window";
+
     Window() {
         super(new BorderLayout());
         try {
@@ -60,8 +61,13 @@ abstract class Window extends JPanel implements ActionListener/*, ItemListener*/
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "update":
-                if (UpdateMgr.updateAvailable()) {
-                    //UpdatePrompt.create();
+                if (!Preferences.autoUpdate) {
+                    UpdateMgr.checkForUpdate();
+                }
+                if (UpdateMgr.getLatestVersion() > PacStatic.VERSION) {
+                    UpdateNotificationPane.launch();
+                } else {
+                    NoUpdateNecessaryNP.launch();
                 }
                 break;
             case "about":

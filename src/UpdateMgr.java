@@ -30,11 +30,8 @@ final class UpdateMgr {
         if (PacStatic.VERSION < latestVersion) {
             LOGGER.info("An update is available!");
             //create update window
+            UpdateNotificationPane.launch();
         }
-    }
-
-    public static boolean updateAvailable() {
-        return latestVersion > PacStatic.VERSION;
     }
 
     public static float getLatestVersion() {
