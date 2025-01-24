@@ -4,10 +4,16 @@ import java.util.logging.Logger;
 class Preferences {
     private static final Logger LOGGER = LoggerFactory.createLogger(Preferences.class.getName());
     static boolean autoUpdate = true;
-    static boolean debug = true;
+    static boolean debug = false;
     static boolean mute = false;
     static boolean playPauseBeat = true;
     static int scale = 1;
+
+    static void mute() {
+        playPauseBeat = false;
+        mute = true;
+        save();
+    }
 
     static void load() {
         try {

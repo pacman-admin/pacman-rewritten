@@ -24,7 +24,11 @@ class PreferencePane extends Window implements ItemListener {
 
     final void main(JPanel p) {
         p.add(createCheckbox("Check for updates during startup", KeyEvent.VK_C, Preferences.autoUpdate));
+        p.add(createCheckbox("Debug", KeyEvent.VK_D, Preferences.debug));
+        p.add(createCheckbox("Mute all sounds", KeyEvent.VK_M, Preferences.mute));
+        p.add(createCheckbox("Play Pause Beat when paused", KeyEvent.VK_B, Preferences.playPauseBeat));
         p.add(createButton("Check for updates", KeyEvent.VK_U, "update"));
+        //p.add(createCheckbox("", KeyEvent.VK_, Preferences.));
     }
 
     final JCheckBox createCheckbox(String title, int key, boolean selected) {
@@ -38,23 +42,29 @@ class PreferencePane extends Window implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
         switch(checkBoxes.indexOf(e.getItemSelectable())){
             case 0:
-                System.out.println("Clicked checkBox 1");
+                LOGGER.info("Clicked checkBox 1");
                 Preferences.autoUpdate = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             case 1:
-                System.out.println("Clicked checkBox 2");
+                LOGGER.info("Clicked checkBox 2");
                 Preferences.debug = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             case 2:
-                System.out.println("Clicked checkBox 3");
-                Preferences.mute = e.getStateChange() == ItemEvent.SELECTED;
+                LOGGER.info("Clicked checkBox 3");
+                if (e.getStateChange() == ItemEvent.SELECTED){
+                    Preferences.mute();
+                    checkBoxes.get(3).setSelected(false);
+                    return;
+                }
+                Preferences.mute = false;
                 break;
             case 3:
-                System.out.println("Clicked checkBox 4");
+                LOGGER.info("Clicked checkBox 4");
                 Preferences.playPauseBeat = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             default:
                 LOGGER.severe("An unknown checkbox was selected/deselected!");
+                return;
         }
         Preferences.save();
     }
