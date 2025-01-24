@@ -19,7 +19,6 @@ class Preferences {
         try {
             ObjectInputStream oIS = new ObjectInputStream(new FileInputStream(PacStatic.PATH + "/PacPreferences.dat"));
             Container savedSettings = (Container) oIS.readObject();
-            //Container savedSettings = new Container();
             autoUpdate = savedSettings.autoUpdate;
             debug = savedSettings.debug;
             mute = savedSettings.mute;

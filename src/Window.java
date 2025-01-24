@@ -1,12 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-abstract class Window extends JPanel implements ActionListener{
+abstract class Window extends JPanel implements ActionListener {
     private static final Logger LOGGER = LoggerFactory.createLogger(Window.class.getName());
     String title = "Empty Window";
 
@@ -44,9 +46,6 @@ abstract class Window extends JPanel implements ActionListener{
         //setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
-
-
-
     final JButton createButton(String text, int key, String command) {
         final JButton b = new JButton(text);
         b.setMnemonic(key);
@@ -54,7 +53,6 @@ abstract class Window extends JPanel implements ActionListener{
         b.addActionListener(this);
         return b;
     }
-
 
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
