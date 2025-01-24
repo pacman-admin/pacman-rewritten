@@ -39,6 +39,7 @@ class PreferencePane extends Window implements ItemListener {
         return checkBoxes.getLast();
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     public void itemStateChanged(ItemEvent e) {
         switch(checkBoxes.indexOf(e.getItemSelectable())){
             case 0:
