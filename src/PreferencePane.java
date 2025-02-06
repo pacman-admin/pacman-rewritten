@@ -12,6 +12,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
 
     private final ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
     private final ArrayList<JSlider> sliders = new ArrayList<>();
+
     private PreferencePane() {
         title = "Preferences";
     }
@@ -25,23 +26,20 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
     }
 
     final void main(JPanel p) {
-         JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, 1, 6, Preferences.pacSpeed);
-
-
-        framesPerSecond.addChangeListener(this);
-
-        //Turn on labels at major tick marks.
-
-        framesPerSecond.setMajorTickSpacing(10);
-        framesPerSecond.setMinorTickSpacing(1);
-        framesPerSecond.setPaintTicks(true);
-        framesPerSecond.setPaintLabels(true);
         p.add(createCheckbox("Check for updates during startup", KeyEvent.VK_C, Preferences.autoUpdate));
         p.add(createCheckbox("Debug", KeyEvent.VK_D, Preferences.debug));
         p.add(createCheckbox("Mute all sounds", KeyEvent.VK_M, Preferences.mute));
         p.add(createCheckbox("Play Pause Beat when paused", KeyEvent.VK_B, Preferences.playPauseBeat));
-        p.add(createButton("Check for updates", KeyEvent.VK_U, "update"));
         //p.add(createCheckbox("", KeyEvent.VK_, Preferences.));
+        p.add(createSlider(4, Preferences.scale));
+        p.add(new JLabel("Scale (enlarge size of everything)"));
+        p.add(createSlider(10, Preferences.pacSpeed));
+        p.add(new JLabel("Pac-Man's speed"));
+        p.add(createSlider(10, Preferences.ghostSpeed));
+        p.add(new JLabel("The Ghosts' speed"));
+        p.add(createButton("Check for updates", KeyEvent.VK_U, "update"));
+        //p.add(createSlider(, ));
+        //p.add(new JLabel(""));
     }
 
     final JCheckBox createCheckbox(String title, int key, boolean selected) {
@@ -50,6 +48,14 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
         checkBoxes.getLast().setSelected(selected);
         checkBoxes.getLast().addItemListener(this);
         return checkBoxes.getLast();
+    }
+
+    final JSlider createSlider(int limit, int val) {
+        sliders.add(new JSlider(JSlider.HORIZONTAL, 1, limit, val));
+        sliders.getLast().addChangeListener(this);
+        sliders.getLast().setMinorTickSpacing(1);
+        sliders.getLast().setPaintTicks(true);
+        return sliders.getLast();
     }
 
     public void itemStateChanged(ItemEvent e) {
@@ -79,15 +85,28 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                 LOGGER.severe("An unknown checkbox was selected/deselected!");
                 return;
         }
+        System.out.println(checkBoxes.indexOf((JCheckBox) e.getItemSelectable()) + ", " + (e.getStateChange() == ItemEvent.SELECTED));
         Preferences.save();
     }
 
     public void stateChanged(ChangeEvent e) {
-        JSlider source = (JSlider) e.getSource();
+        final JSlider source = (JSlider) e.getSource();
         if (!source.getValueIsAdjusting()) {
-            switch (source) {
-                case Preferences.pacSpeed = source.getValue();
+            switch (sliders.indexOf(source)) {
+                case 0:
+                    Preferences.scale = source.getValue();
+                    break;
+                case 1:
+                    Preferences.pacSpeed = source.getValue();
+                    break;
+                case 2:
+                    Preferences.ghostSpeed = source.getValue();
+                    break;
+                default:
+                    LOGGER.severe("An unknown slider was adjusted!");
+                    return;
             }
+            Preferences.save();
         }
     }
 }

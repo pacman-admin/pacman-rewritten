@@ -26,6 +26,8 @@ class Preferences {
             mute = savedSettings.mute;
             playPauseBeat = savedSettings.playPauseBeat;
             scale = savedSettings.scale;
+            pacSpeed = savedSettings.pacSpeed;
+            ghostSpeed = savedSettings.ghostSpeed;
             oIS.close();
         } catch (IOException e) {
             LOGGER.warning("Could not load settings. Perhaps the file does not exist.");
@@ -52,6 +54,7 @@ class Preferences {
         private final boolean mute = Preferences.mute;
         private final boolean playPauseBeat = Preferences.playPauseBeat;
         private final int scale = Preferences.scale;
-        private final int pacSpeed =
+        private final int pacSpeed = Preferences.pacSpeed;
+        private final int ghostSpeed = Preferences.ghostSpeed;
     }
 }

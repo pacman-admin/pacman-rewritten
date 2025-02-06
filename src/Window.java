@@ -43,7 +43,6 @@ abstract class Window extends JPanel implements ActionListener {
         infoPanel.add(new JLabel("pacman@langdonstaab.ca | www.langdonstaab.ca"));
         infoPanel.add(new JLabel("Copyright © 2025 Langdon Staab"));
         add(infoPanel, BorderLayout.LINE_START);
-        //setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
     final JButton createButton(String text, int key, String command) {
