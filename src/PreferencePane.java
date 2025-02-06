@@ -1,15 +1,17 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-class PreferencePane extends Window implements ItemListener {
+class PreferencePane extends Window implements ItemListener, ChangeListener {
     private static final Logger LOGGER = LoggerFactory.createLogger(PreferencePane.class.getName());
 
     private final ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
-
+    private final ArrayList<JSlider> sliders = new ArrayList<>();
     private PreferencePane() {
         title = "Preferences";
     }
@@ -23,6 +25,17 @@ class PreferencePane extends Window implements ItemListener {
     }
 
     final void main(JPanel p) {
+         JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, 1, 6, Preferences.pacSpeed);
+
+
+        framesPerSecond.addChangeListener(this);
+
+        //Turn on labels at major tick marks.
+
+        framesPerSecond.setMajorTickSpacing(10);
+        framesPerSecond.setMinorTickSpacing(1);
+        framesPerSecond.setPaintTicks(true);
+        framesPerSecond.setPaintLabels(true);
         p.add(createCheckbox("Check for updates during startup", KeyEvent.VK_C, Preferences.autoUpdate));
         p.add(createCheckbox("Debug", KeyEvent.VK_D, Preferences.debug));
         p.add(createCheckbox("Mute all sounds", KeyEvent.VK_M, Preferences.mute));
@@ -39,9 +52,8 @@ class PreferencePane extends Window implements ItemListener {
         return checkBoxes.getLast();
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     public void itemStateChanged(ItemEvent e) {
-        switch(checkBoxes.indexOf(e.getItemSelectable())){
+        switch (checkBoxes.indexOf((JCheckBox) e.getItemSelectable())) {
             case 0:
                 LOGGER.info("Clicked checkBox 1");
                 Preferences.autoUpdate = e.getStateChange() == ItemEvent.SELECTED;
@@ -52,7 +64,7 @@ class PreferencePane extends Window implements ItemListener {
                 break;
             case 2:
                 LOGGER.info("Clicked checkBox 3");
-                if (e.getStateChange() == ItemEvent.SELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     Preferences.mute();
                     checkBoxes.get(3).setSelected(false);
                     return;
@@ -68,5 +80,14 @@ class PreferencePane extends Window implements ItemListener {
                 return;
         }
         Preferences.save();
+    }
+
+    public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider) e.getSource();
+        if (!source.getValueIsAdjusting()) {
+            switch (source) {
+                case Preferences.pacSpeed = source.getValue();
+            }
+        }
     }
 }

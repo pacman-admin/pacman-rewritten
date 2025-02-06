@@ -8,6 +8,8 @@ class Preferences {
     static boolean mute = false;
     static boolean playPauseBeat = true;
     static int scale = 1;
+    static int pacSpeed = 3;
+    static int ghostSpeed = 2;
 
     static void mute() {
         playPauseBeat = false;
@@ -39,7 +41,7 @@ class Preferences {
             oOS.writeObject(new Container());
             oOS.close();
         } catch (IOException e) {
-            LOGGER.warning("Could not save Preferences to disk. Perhaps your home directory (~) is not writable?");
+            LOGGER.warning("Could not save Preferences to disk. Perhaps your home directory (~) is not writable.");
             LOGGER.warning(e.toString());
         }
     }
@@ -50,5 +52,6 @@ class Preferences {
         private final boolean mute = Preferences.mute;
         private final boolean playPauseBeat = Preferences.playPauseBeat;
         private final int scale = Preferences.scale;
+        private final int pacSpeed =
     }
 }
