@@ -708,9 +708,6 @@ public class GameWindow extends PApplet {
 
         void update() {
             eaten = false;
-            if (isFruit) {
-                fruitWorth = 100;
-            }
         }
 
         private void isBEaten() throws FileNotFoundException {
@@ -748,7 +745,6 @@ public class GameWindow extends PApplet {
                     determineFruitType();
                     durationStart = millis();
                     duration = 2000 + millis();
-                    System.gc();
                 }
             }
         }
