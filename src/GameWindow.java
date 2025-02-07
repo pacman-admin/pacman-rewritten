@@ -68,7 +68,7 @@ public class GameWindow extends PApplet {
     private PImage settingsB;
     private PImage pauseButtonImg;
 
-    public static void main() {
+    static void launch() {
         PApplet.main(new String[]{"GameWindow"});
     }
 
@@ -276,18 +276,6 @@ public class GameWindow extends PApplet {
         text("HIGH SCORE\n" + highScore, width / 2f, 16);
         displayMessages();
         pacman.show(chomp);
-    }
-
-    String loadString(String filename) {
-        String[] ret;
-        String data;
-        try {
-            ret = loadStrings(filename);
-            data = ret[0];
-            return data;
-        } catch (Exception ignored) {
-            return "error";
-        }
     }
 
     public void keyPressed() {

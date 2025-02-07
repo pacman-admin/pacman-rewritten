@@ -10,6 +10,6 @@ public final class Main {
         LOGGER.info("Starting Pac-Man 14.0...");
         new LoadingThread();
         PreferencePane.launch();
-        GameWindow.main();
+        GameWindow.launch();
     }
 }
