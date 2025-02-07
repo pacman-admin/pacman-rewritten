@@ -7,6 +7,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+/**
+ * @author Langdon Staab
+ */
 class PreferencePane extends Window implements ItemListener, ChangeListener {
     private static final Logger LOGGER = LoggerFactory.createLogger(PreferencePane.class.getName());
 
@@ -106,6 +109,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                     LOGGER.severe("An unknown slider was adjusted!");
                     return;
             }
+            System.out.println(sliders.indexOf(source) + ", " + source.getValue());
             Preferences.save();
         }
     }

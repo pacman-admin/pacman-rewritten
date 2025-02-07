@@ -8,6 +8,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
+/**
+ * @author Langdon Staab
+ */
 abstract class Window extends JPanel implements ActionListener {
     private static final Logger LOGGER = LoggerFactory.createLogger(Window.class.getName());
     String title = "Empty Window";

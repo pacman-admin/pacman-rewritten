@@ -1,0 +1,3 @@
+enum Sound {
+    GAME_START, WA, KA, DEATH, EXTRA_LIFE, PAUSE, PAUSE_BEAT, FRUIT
+}

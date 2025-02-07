@@ -1,0 +1,3 @@
+public enum Fruit {
+    CHERRY, STRAWBERRY, ORANGE, APPLE, MELON, GALAXIAN, BELL, KEY
+}

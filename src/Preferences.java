@@ -1,6 +1,9 @@
 import java.io.*;
 import java.util.logging.Logger;
 
+/**
+ * @author Langdon Staab
+ */
 class Preferences {
     private static final Logger LOGGER = LoggerFactory.createLogger(Preferences.class.getName());
     static boolean autoUpdate = true;
