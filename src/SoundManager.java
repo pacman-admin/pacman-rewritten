@@ -1,5 +1,7 @@
-import javax.sound.sampled.*;
-import java.io.BufferedInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -7,60 +9,120 @@ import java.util.logging.Logger;
 final class SoundManager {
     private static final Logger LOGGER = LoggerFactory.createLogger(SoundManager.class.getName());
     private static Clip pauseBeat;
+    private static Clip wa;
+    private static Clip ka;
+    private static boolean wakaToggle = true;
 
-    private static Clip getClip(String filename) {
+    private static Clip getClip(String filename) throws LineUnavailableException {
         InputStream is = SoundManager.class.getResourceAsStream(filename);
-        assert is != null;
-        try (AudioInputStream in = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
+        try {
             final Clip clip = AudioSystem.getClip();
-            clip.open(in);
+            assert is != null;
+            clip.open(AudioSystem.getAudioInputStream(is));
             is.close();
-            in.close();
             return clip;
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+            LOGGER.warning("Error while loading sound\n" + e);
+        }
+        return AudioSystem.getClip();
+    }
+
+    private static void playClip(String filename) {
+        InputStream is = SoundManager.class.getResourceAsStream(filename);
+        //LOGGER.warning("\n"+e);
+        try {
+            Clip clip = AudioSystem.getClip();
+            assert clip != null;
+            assert is != null;
+            clip.open(AudioSystem.getAudioInputStream(is));
+            clip.start();
+            is.close();
+            LOGGER.info("Clip started");
+            while (clip.isActive()) ;
+            LOGGER.info("Clip ended");
+            clip.close();
+            return;
+        } catch (LineUnavailableException e) {
+            LOGGER.warning("Line Unavailable!\n" + e);
+        } catch (IOException e) {
+            LOGGER.warning("IOException while opening audio stream!\n" + e);
+        } catch (UnsupportedAudioFileException e) {
+            LOGGER.warning("Unsupported audio type!\n" + e);
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     static void play(Sound what) {
-        Clip clip;
         switch (what) {
             case Sound.WA:
-                clip = getClip("DOT_1.wav");
+                playClip("DOT_1.wav");
                 break;
             case Sound.KA:
-                clip = getClip("DOT_2.wav");
+                playClip("DOT_2.wav");
                 break;
             case Sound.GAME_START:
-                clip = getClip("GAME_START.wav");
+                playClip("GAME_START.wav");
                 break;
             case Sound.DEATH:
-                clip = getClip("DEATH.wav");
+                playClip("DEATH.wav");
                 break;
             case Sound.EXTRA_LIFE:
-                clip = getClip("EXTRA_LIFE.wav");
+                playClip("EXTRA_LIFE.wav");
                 break;
             case Sound.PAUSE:
-                clip = getClip("PAUSE.wav");
+                playClip("PAUSE.wav");
                 break;
             case Sound.FRUIT:
-                clip = getClip("FRUIT.wav");
+                playClip("FRUIT.wav");
                 break;
             default:
                 LOGGER.severe("Attempt to play nonexistent sound");
-                return;
         }
-        clip.start();
-        clip.close();
     }
 
     static void loopPauseBeat() {
-        pauseBeat = getClip("PAUSE_BEAT.wav");
+        try {
+            pauseBeat = getClip("PAUSE_BEAT.wav");
+        } catch (LineUnavailableException e) {
+            LOGGER.warning("Can't play pause beat. Line unavailable\n" + e);
+            return;
+        }
         pauseBeat.loop(Clip.LOOP_CONTINUOUSLY);
+        LOGGER.info("Pause beat started");
+    }
+
+    static void preloadWaka() throws LineUnavailableException {
+        wa = getClip("DOT_1.wav");
+        ka = getClip("DOT_2.wav");
+    }
+
+    static void waka() {
+        if (wakaToggle){
+            wa.setFramePosition(0);
+            wa.start();
+            wakaToggle = false;
+            return;
+        }
+        ka.setFramePosition(0);
+        ka.start();
+        wakaToggle = true;
     }
 
     static void stopPauseBeat() {
         pauseBeat.stop();
+        LOGGER.info("Pause beat stopped");
         pauseBeat.close();
+    }
+    static void closeAll(){
+        pauseBeat.stop();
+        wa.stop();
+        ka.stop();
+        pauseBeat.close();
+        wa.close();
+        ka.close();
     }
 }

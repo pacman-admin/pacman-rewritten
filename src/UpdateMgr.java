@@ -31,6 +31,8 @@ final class UpdateMgr {
             LOGGER.info("An update is available!");
             //create update window
             UpdateNotificationPane.launch();
+        }else{
+            NoUpdateNecessaryNP.launch();
         }
     }
 

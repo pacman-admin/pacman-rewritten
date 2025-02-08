@@ -1,3 +1,4 @@
+import javax.sound.sampled.LineUnavailableException;
 import java.util.logging.Logger;
 
 final class LoadingThread extends Thread {
@@ -14,6 +15,16 @@ final class LoadingThread extends Thread {
         Preferences.load();
         if (Preferences.autoUpdate) {
             UpdateMgr.checkForUpdate();
+        }
+
+        if(Preferences.mute){
+            return;
+        }
+        try {
+            SoundManager.preloadWaka();
+        } catch (LineUnavailableException e) {
+            LOGGER.warning("Error while loading 'waka' sounds! All sounds have been muted.\n"+e);
+            Preferences.mute = true;
         }
         //LOGGER.info("Thread finished.");
     }

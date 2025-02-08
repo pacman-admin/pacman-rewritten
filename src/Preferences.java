@@ -15,6 +15,7 @@ class Preferences {
     static int ghostSpeed = 2;
 
     static void mute() {
+        SoundManager.closeAll();
         playPauseBeat = false;
         mute = true;
         save();
