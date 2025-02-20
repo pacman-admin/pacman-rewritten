@@ -1,5 +1,3 @@
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -13,15 +11,9 @@ public final class Main {
         LOGGER.info("Starting Pac-Man 14.0...");
         new LoadingThread();
         GameWindow.launch();
-        //SoundManager.play(Sound.EXTRA_LIFE);
-        final Timer t = new Timer(true);
-        t.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                SoundManager.waka();
-            }
-        },2000,200);
-        //SoundManager.loopPauseBeat();
-        //SoundManager.play(Sound.);
+        Ghost g = new Ghost(GhostType.BLINKY);
+        g.start();
+        g.updateCoords();
+        LOGGER.info(g.x + ", " + g.y + "; " + g.debugCoords());
     }
 }
