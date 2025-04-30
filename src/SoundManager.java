@@ -20,9 +20,21 @@ final class SoundManager {
     private static boolean wakaToggle = true;
 
     static void closeSounds() {
-        pauseBeat.close();
-        wa.close();
-        ka.close();
+        try {
+            wa.close();
+        } catch (Exception e) {
+            LOGGER.warning("Error while closing wa.\n" + e);
+        }
+        try {
+            ka.close();
+        } catch (Exception e) {
+            LOGGER.warning("Error while closing ka.\n" + e);
+        }
+        try {
+            pauseBeat.close();
+        } catch (Exception e) {
+            LOGGER.warning("Error while closing pauseBeat.\n" + e);
+        }
     }
 
     private static void openClip(Clip c, String filename) {
@@ -132,6 +144,9 @@ final class SoundManager {
     }
 
     static void closeAll() {
+        System.out.println("Closing resources...");
+        System.err.println("Closing resources...");
+        LOGGER.info("Closing resources...");
         closeSounds();
         soundPlayer.shutdown();
         LOGGER.info("All resources closed. Goodbye!");
@@ -164,5 +179,4 @@ final class SoundManager {
         }
         clip.close();
     }
-
 }

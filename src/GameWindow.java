@@ -16,20 +16,18 @@ public final class GameWindow extends PApplet {
     private int startMillis;
     private int time;
     private int pauseUntil;
-
+    private Pellet[] pellets = new Pellet[78];
 
     //private PImage maze_white;
     //private PImage currentFruitSprite;
-    // private FruitSpriteContainer fruitSprites;
+    //private FruitSpriteContainer fruitSprites;
     private PImage maze_blue;
 
     public static void main(String[] ignored) {
-        SoundManager.preloadStartSound();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            LOGGER.info("Closing resources...");
-            SoundManager.closeAll();
-        }));
+        //SoundManager.preloadStartSound();
+        Runtime.getRuntime().addShutdownHook(new Thread(SoundManager::closeAll));
         PApplet.main(new String[]{"GameWindow"});
+        new LoadingThread();
         LOGGER.info("Pac-Man started");
     }
 
@@ -39,24 +37,29 @@ public final class GameWindow extends PApplet {
 
     private void calcTime() {
         time = millis() - startMillis;
-        Math.sqrt(Math.pow(2,4));
+        Math.sqrt(Math.pow(2, 4));
     }
 
     public void setup() {
         ghosts = new Ghost[]{new Ghost(GhostType.BLINKY), new Ghost(GhostType.INKY), new Ghost(GhostType.PINKY)};
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
+        imageMode(CENTER);
         //fruitSprites = new FruitSpriteContainer();
         noStroke();
-        int i = 0;
-        for (boolean[] row : PacStatic.MAP_DESIGN){
-            for (boolean open : row){
-                if (open){
-
+        int pelletCount = 0;
+        for (int i = 0; i < PacStatic.MAP_DESIGN.length; i++) {
+            for (int j = 0; j < PacStatic.MAP_DESIGN[0].length; j++) {
+                if (PacStatic.MAP_DESIGN[i][j]) {
+                    if (i > 1 || j > 1) {
+                        pellets[pelletCount] = new Pellet(j, i);
+                        pelletCount++;
+                    }
                 }
             }
         }
-        LOGGER.info("Bla" + -time);
+        LOGGER.info("Bla" + time);
+        LOGGER.info("# of pellets: " + pelletCount);
         //maze_white = loadImage("maze_white.png");
     }
 
@@ -69,7 +72,7 @@ public final class GameWindow extends PApplet {
 
     private void startGame() {
         pauseUntil = time + 4500;
-        if (!first) {
+        if (!first || Preferences.mute) {
             return;
         }
         SoundManager.playStartSound();
@@ -91,21 +94,27 @@ public final class GameWindow extends PApplet {
             return;
         }*/
         calcTime();
-        image(maze_blue, 0, 0);
+        image(maze_blue, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
         if (time < pauseUntil) {
             return;
         }
         if (first1) {
-            new LoadingThread();
+            //new LoadingThread();
             first1 = false;
             for (Ghost g : ghosts) {
                 g.start();
             }
             return;
         }
+        drawPellets();
+
         drawGhosts();
-        if (frameCount % 3600 == 3599) {
-            SoundManager.play(Sound.DEATH);
+    }
+
+    private void drawPellets() {
+        fill(250, 185, 176);
+        for (Pellet pellet : pellets) {
+            pellet.show();
         }
     }
 
@@ -121,7 +130,7 @@ public final class GameWindow extends PApplet {
         }
     }
 
-    class Ghost extends Entity {
+    private final class Ghost extends Entity {
         final GameWindow.GhostSpriteContainer sprites;
         private final GhostType t;
         private Dir dir;
@@ -141,16 +150,16 @@ public final class GameWindow extends PApplet {
         void start() {
             switch (t) {
                 case GhostType.BLINKY:
-                    x = PacStatic.CELLWIDTH * Preferences.scale * 5;
-                    y = PacStatic.CELLWIDTH * Preferences.scale * 5;
+                    x = PacStatic.CELLWIDTH * 5 + PacStatic.HALF_CELLWIDTH;
+                    y = PacStatic.CELLWIDTH * 5 + PacStatic.HALF_CELLWIDTH;
                     break;
                 case GhostType.INKY:
-                    x = 45;
-                    y = 67;
+                    x = PacStatic.CELLWIDTH * 6 + PacStatic.HALF_CELLWIDTH;
+                    y = PacStatic.CELLWIDTH * 10 + PacStatic.HALF_CELLWIDTH;
                     break;
                 case GhostType.PINKY:
-                    x = 36;
-                    y = 95;
+                    x = PacStatic.CELLWIDTH * 10 + PacStatic.HALF_CELLWIDTH;
+                    y = PacStatic.CELLWIDTH * 9 + PacStatic.HALF_CELLWIDTH;
                     break;
             }
             dir = Dir.UP;
@@ -235,6 +244,31 @@ public final class GameWindow extends PApplet {
             }
         }
     }
+
+    private class Pellet extends Entity {
+        private boolean eaten;
+
+        private Pellet(int cellCol, int cellRow) {
+            x = cellCol * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            y = cellRow * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            reset();
+        }
+
+        void eat() {
+            eaten = true;
+        }
+
+        void show() {
+            if (!eaten) {
+                circle(x * Preferences.scale, y * Preferences.scale, 14 * Preferences.scale);
+            }
+        }
+
+        void reset() {
+            eaten = false;
+        }
+    }
+
 
     private final class FruitSpriteContainer extends Thread {
         final PImage[] fruit = new PImage[8];
