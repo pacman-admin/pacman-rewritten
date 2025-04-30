@@ -15,10 +15,16 @@ class Preferences {
     static int ghostSpeed = 2;
 
     static void mute() {
-        SoundManager.closeAll();
+        SoundManager.closeSounds();
         playPauseBeat = false;
         mute = true;
         save();
+    }
+    static void unMute(){
+        new Thread(() -> {
+            SoundManager.preload();
+            mute = false;
+        }).start();
     }
 
     static void load() {

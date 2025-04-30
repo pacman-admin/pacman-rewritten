@@ -78,7 +78,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                     checkBoxes.get(3).setSelected(false);
                     return;
                 }
-                Preferences.mute = false;
+                Preferences.unMute();
                 break;
             case 3:
                 LOGGER.info("Clicked checkBox 4");
@@ -98,6 +98,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
             switch (sliders.indexOf(source)) {
                 case 0:
                     Preferences.scale = source.getValue();
+                    PacStatic.scaleWasChanged = true;
                     break;
                 case 1:
                     Preferences.pacSpeed = source.getValue();

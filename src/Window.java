@@ -59,25 +59,24 @@ abstract class Window extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "update":
-                if (!Preferences.autoUpdate) {
+                /*if (!Preferences.autoUpdate) {
                     UpdateMgr.checkForUpdate();
                 }
                 if (UpdateMgr.getLatestVersion() > PacStatic.VERSION) {
                     UpdateNotificationPane.launch();
                 } else {
                     NoUpdateNecessaryNP.launch();
-                }
-                break;
+                }*/
+                return;
             case "about":
                 InfoPane.launch();
-                break;
+                return;
             case "donate":
                 try {
                     Desktop.getDesktop().browse(new URI("https://buymeacoff.ee/langdonstaab"));
                 } catch (IOException | URISyntaxException ex) {
                     throw new RuntimeException("Error opening popup in browser", ex);
                 }
-                break;
         }
     }
 }
