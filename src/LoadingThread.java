@@ -18,7 +18,7 @@ final class LoadingThread extends Thread {
         /*if (Preferences.autoUpdate) {
             UpdateMgr.checkForUpdate();
         }*/
-        //PreferencePane.launch();
+        PreferencePane.launch();
         LOGGER.info("Thread finished.");
     }
 }
