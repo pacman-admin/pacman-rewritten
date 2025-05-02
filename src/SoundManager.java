@@ -2,7 +2,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -13,7 +12,7 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 final class SoundManager {
     private static final Logger LOGGER = LoggerFactory.createLogger(SoundManager.class.getName());
     //private static final ExecutorService soundPlayer = newCachedThreadPool();
-    private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(2);
+    private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(3);
     private static Clip pauseBeat;
     private static Clip wa;
     private static Clip ka;
@@ -100,6 +99,7 @@ final class SoundManager {
             Preferences.mute();
             throw new RuntimeException("Line Unavailable!" + e, e);
         }
+        soundPlayer.submit(new AsynchronousBlankClipLooper());
         while (soundPlayer.getActiveCount() > 1) ;
         openClip(wa, "DOT_1.wav");
         wa.start();
@@ -126,16 +126,19 @@ final class SoundManager {
         }).start();
     }
 
+
     static void waka() {
-        if (wakaToggle) {
-            wa.setFramePosition(0);
-            wa.start();
-            wakaToggle = false;
-            return;
-        }
-        ka.setFramePosition(0);
-        ka.start();
-        wakaToggle = true;
+        soundPlayer.submit(() -> {
+            if (wakaToggle) {
+                wa.setFramePosition(0);
+                wa.start();
+                wakaToggle = false;
+                return;
+            }
+            ka.setFramePosition(0);
+            ka.start();
+            wakaToggle = true;
+        });
     }
 
     static void stopPauseBeat() {
@@ -152,6 +155,10 @@ final class SoundManager {
         LOGGER.info("All resources closed. Goodbye!");
     }
 
+    static void loopEmptyClip() {
+
+    }
+
     static void playStartSound() {
         Clip clip;
         try {
@@ -161,7 +168,7 @@ final class SoundManager {
             return;
         }
         try {
-            InputStream is = new BufferedInputStream(SoundManager.class.getResourceAsStream("GAME_START.wav"));
+            InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
             clip.open(AudioSystem.getAudioInputStream(is));
             while (!clip.isOpen()) ;
             clip.start();

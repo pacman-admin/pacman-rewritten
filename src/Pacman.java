@@ -1,4 +1,4 @@
-class Pacman extends Entity {
+final class Pacman extends Entity {
     private Dir nextDir;
 
     void move() {
@@ -86,8 +86,11 @@ class Pacman extends Entity {
         x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
         y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
     }
+    void freeze(){
+        dir = Dir.STOPPED;
+        nextDir = Dir.STOPPED;
+    }
 
-    @Override
     void reset() {
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;

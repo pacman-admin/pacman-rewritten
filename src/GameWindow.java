@@ -1,36 +1,38 @@
 import processing.core.PApplet;
 import processing.core.PImage;
 
-import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
  * @author Langdon Staab
  * Rewriten 2025
  */
-
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
-    private final Pellet[] pellets = new Pellet[78];
-    private Ghost[] ghosts;
+    private final Pickup[] pellets = new Pickup[78];
+    private ShowableGhost[] ghosts;
     private boolean first = true;
     private boolean first1 = true;
-    private int pelletsEaten;
+    private int pelletsEaten = 0;
     private int score = 0;
     //private boolean paused;
     private int level = 2;
     private int startMillis;
     private int time;
     private int pauseUntil;
+    //private boolean dying = false;
     //private PImage maze_white;
     private PImage maze_blue;
     private Pacman pacman = new Pacman();
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
-        Runtime.getRuntime().addShutdownHook(new Thread(SoundManager::closeAll));
+        SoundManager.preloadStartSound();
         PApplet.main(new String[]{"GameWindow"});
         new LoadingThread();
+        Runtime.getRuntime().addShutdownHook(new Thread(SoundManager::closeAll));
         LOGGER.info("Pac-Man started");
     }
 
@@ -56,7 +58,7 @@ public final class GameWindow extends PApplet {
         noStroke();
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
-        ghosts = new Ghost[]{new Ghost(GhostType.BLINKY), new Ghost(GhostType.INKY), new Ghost(GhostType.PINKY)};
+        ghosts = new ShowableGhost[]{new ShowableGhost(GhostType.BLINKY), new ShowableGhost(GhostType.INKY), new ShowableGhost(GhostType.PINKY)};
         int pelletCount = 0;
         for (int i = 1; i < PacStatic.MAP_DESIGN.length - 1; i++) {
             for (int j = 1; j < PacStatic.MAP_DESIGN[0].length - 1; j++) {
@@ -90,25 +92,21 @@ public final class GameWindow extends PApplet {
             first = false;
             LOGGER.info("Game started!");
         }
-
         /*if (paused) {
             return;
         }*/
         calcTime();
         image(maze_blue, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
-        /*if (time < pauseUntil) {
+        if (time < pauseUntil) {
             return;
-        }*/
+        }
         if (first1) {
+            pacman.freeze();
             first1 = false;
             for (Ghost g : ghosts) {
                 g.start();
             }
-            return;
-        }
-        if (pelletsEaten > 76) {
-            level++;
-
+            pacman.reset();
         }
         drawPellets();
         drawGhosts();
@@ -118,10 +116,12 @@ public final class GameWindow extends PApplet {
 
     private void drawPellets() {
         fill(250, 185, 176);
-        for (Pellet pellet : pellets) {
-            pellet.show();
+        for (Pickup p : pellets) {
+            p.checkIfBeingEaten(pacman.x, pacman.y);
+            p.show();
         }
     }
+
     private void showPacman() {
         //fill(255, 255, 128+32);
         fill(255, 64, 64);
@@ -131,7 +131,18 @@ public final class GameWindow extends PApplet {
 
     private void drawGhosts() {
         final int whichSprite = (frameCount % 50 < 26) ? 0 : 1;
-        for (Ghost g : ghosts) {
+        for (ShowableGhost g : ghosts) {
+            if(g.isTouching(pacman.x, pacman.y)){
+                pauseUntil = 2000 + time;
+                SoundManager.play(Sound.DEATH);
+                pacman.freeze();
+                first1 = true;
+                for(Ghost ghost : ghosts){
+                    ghost.reset();
+                }
+                pacman.freeze();
+                return;
+            }
             g.move();
             switch (g.dir) {
                 case Dir.UP -> image(g.sprites.up[whichSprite], g.x, g.y);
@@ -142,177 +153,50 @@ public final class GameWindow extends PApplet {
         }
     }
 
-    private final class Ghost extends Entity {
+    private final class ShowableGhost extends Ghost {
         private final GameWindow.GhostSpriteContainer sprites;
-        private final GhostType t;
-        Random random = new Random();
 
-        private Ghost(GhostType gT) {
-            t = gT;
+        ShowableGhost(GhostType gT) {
+            super(gT);
             sprites = new GameWindow.GhostSpriteContainer(gT);
-            reset();
-        }
-
-        void reset() {
-            dir = Dir.STOPPED;
-        }
-
-        private void start() {
-            switch (t) {
-                case GhostType.BLINKY:
-                    coordsX = 5;
-                    coordsY = 5;
-                    break;
-                case GhostType.INKY:
-                    coordsX = 6;
-                    coordsY = 10;
-                    break;
-                case GhostType.PINKY:
-                    coordsX = 10;
-                    coordsY = 9;
-                    break;
-            }
-            x = PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH;
-            y = PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH;
-            dir = Dir.UP;
-        }
-
-        private void changeDir() {
-            switch (random.nextInt() % 4) {
-                case 0 -> {
-                    if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        dir = Dir.UP;
-                        move();
-                        return;
-                    }
-                    changeDir();
-                }
-                case 1 -> {
-                    if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        dir = Dir.RIGHT;
-                        move();
-                        return;
-                    }
-                    changeDir();
-                }
-                case 2 -> {
-                    if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        dir = Dir.DOWN;
-                        move();
-                        return;
-                    }
-                    changeDir();
-                }
-                case 3 -> {
-                    if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        dir = Dir.LEFT;
-                        move();
-                        return;
-                    }
-                    changeDir();
-                }
-            }
-        }
-
-        private void move() {
-            switch (dir) {
-                case Dir.UP:
-                    if (y < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                        y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    y -= Preferences.ghostSpeed;
-                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        changeDir();
-                    }
-                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x++;
-                    }
-                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x--;
-                    }
-                    return;
-                case Dir.LEFT:
-                    if (x < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                        x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    x -= Preferences.ghostSpeed;
-                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 3 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        changeDir();
-                    }
-                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y++;
-                    }
-                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y--;
-                    }
-                    return;
-                case Dir.DOWN:
-                    if (y > PacStatic.CELLWIDTH * 11.5f) y = (int) (PacStatic.CELLWIDTH * 11.5f);
-                    y += Preferences.ghostSpeed;
-                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        changeDir();
-                    }
-                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x++;
-                    }
-                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x--;
-                    }
-                    return;
-                case Dir.RIGHT:
-                    if (x > PacStatic.CELLWIDTH * 11.5f) x = (int) (PacStatic.CELLWIDTH * 11.5f);
-                    x += Preferences.ghostSpeed;
-                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        changeDir();
-                    }
-                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y++;
-                    }
-                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y--;
-                    }
-            }
         }
     }
 
-    private class Pellet {
-        final int x, y;
-        private boolean eaten;
-
+    private final class Pellet extends Pickup {
         private Pellet(int cellCol, int cellRow) {
-            x = cellCol * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-            y = cellRow * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-            reset();
-        }
-
-        private void eat() {
-            eaten = true;
-            increaseScore();
+            super(cellCol, cellRow);
         }
 
         void increaseScore() {
-            pelletsEaten++;
+            SoundManager.waka();
             score += 10;
+            if (pelletsEaten > 75) {
+                pauseUntil = 2000 + time;
+                pacman.freeze();
+                first1 = true;
+                pacman.freeze();
+                pelletsEaten = 0;
+                level++;
+                new Timer("Delayed pellet reset handler").schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        for (Pickup p : pellets) {
+                            p.reset();
+                        }
+                    }
+                },1000);
+                return;
+            }
+            pelletsEaten++;
+
         }
 
         void handleDraw() {
             ellipse(x * Preferences.scale, y * Preferences.scale, 14 * Preferences.scale, 14 * Preferences.scale);
         }
-
-        private void show() {
-            if (!eaten) {
-                handleDraw();
-            }
-        }
-
-        void reset() {
-            eaten = false;
-        }
     }
 
-    private final class Fruit extends Pellet {
+    private final class Fruit extends Pickup {
         private static int typeID = 0;
         private final FruitSpriteContainer sprites;
 
@@ -322,6 +206,7 @@ public final class GameWindow extends PApplet {
         }
 
         void increaseScore() {
+            SoundManager.play(Sound.FRUIT);
             score += PacStatic.getFruitValue(typeID);
         }
 
@@ -354,7 +239,7 @@ public final class GameWindow extends PApplet {
         }
     }
 
-    private final class GhostSpriteContainer extends Thread {
+    final class GhostSpriteContainer extends Thread {
         private final PImage[] up = new PImage[2];
         private final PImage[] right = new PImage[2];
         private final PImage[] down = new PImage[2];
