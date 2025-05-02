@@ -113,7 +113,7 @@ public final class GameWindow extends PApplet {
         drawPellets();
         drawGhosts();
         pacman.move();
-        pacman.show();
+        showPacman();
     }
 
     private void drawPellets() {
@@ -121,6 +121,12 @@ public final class GameWindow extends PApplet {
         for (Pellet pellet : pellets) {
             pellet.show();
         }
+    }
+    private void showPacman() {
+        //fill(255, 255, 128+32);
+        fill(255, 64, 64);
+        //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
+        rect(pacman.x * Preferences.scale, pacman.y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
     }
 
     private void drawGhosts() {
@@ -171,68 +177,6 @@ public final class GameWindow extends PApplet {
             dir = Dir.UP;
         }
 
-        private void move() {
-            switch (dir) {
-                case Dir.UP:
-                    if (y < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                        y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    y -= Preferences.ghostSpeed;
-                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 3) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        changeDir();
-                    }
-                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x++;
-                    }
-                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x--;
-                    }
-                    return;
-                case Dir.LEFT:
-                    if (x < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                        x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    x -= Preferences.ghostSpeed;
-                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 3) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        changeDir();
-                    }
-                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y++;
-                    }
-                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y--;
-                    }
-                    return;
-                case Dir.DOWN:
-                    if (y > PacStatic.CELLWIDTH * 11.5f) y = (int) (PacStatic.CELLWIDTH * 11.5f);
-                    y += Preferences.ghostSpeed;
-                    coordsY = (y - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        changeDir();
-                    }
-                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x++;
-                    }
-                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                        x--;
-                    }
-                    return;
-                case Dir.RIGHT:
-                    if (x > PacStatic.CELLWIDTH * 11.5f) x = (int) (PacStatic.CELLWIDTH * 11.5f);
-                    x += Preferences.ghostSpeed;
-                    coordsX = (x - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
-                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        changeDir();
-                    }
-                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y++;
-                    }
-                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                        y--;
-                    }
-            }
-        }
-
         private void changeDir() {
             switch (random.nextInt() % 4) {
                 case 0 -> {
@@ -269,113 +213,67 @@ public final class GameWindow extends PApplet {
                 }
             }
         }
-    }
-
-    private class Pacman extends Entity {
-        private Dir nextDir;
-
-        @Override
-        void reset() {
-            dir = Dir.STOPPED;
-            nextDir = Dir.STOPPED;
-            x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-            y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-            coordsX = 1;
-            coordsY = 1;
-        }
-
-        private void show() {
-            //fill(255, 255, 128+32);
-            fill(255, 64, 64);
-            //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
-            rect(x * Preferences.scale, y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
-        }
 
         private void move() {
-            switch (nextDir) {
-                case Dir.UP:
-                    if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        dir = nextDir;
-                        break;
-                    }
-                    break;
-                case Dir.LEFT:
-                    if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        dir = nextDir;
-                        break;
-                    }
-                    break;
-                case Dir.DOWN:
-                    if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        dir = nextDir;
-                        break;
-                    }
-                    break;
-                case Dir.RIGHT:
-                    if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        dir = nextDir;
-                        break;
-                    }
-                    break;
-                default:
-                    return;
-            }
             switch (dir) {
                 case Dir.UP:
-                    y -= Preferences.pacSpeed;
-                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (y < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
+                        y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    y -= Preferences.ghostSpeed;
+                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        halt();
+                        changeDir();
                     }
-                    //x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
+                        x++;
+                    }
+                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
+                        x--;
+                    }
                     return;
                 case Dir.LEFT:
-                    x -= Preferences.pacSpeed;
-                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 4 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (x < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
+                        x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    x -= Preferences.ghostSpeed;
+                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 3 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        halt();
+                        changeDir();
                     }
-                    //y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
+                        y++;
+                    }
+                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
+                        y--;
+                    }
                     return;
                 case Dir.DOWN:
-                    y += Preferences.pacSpeed;
-                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (y > PacStatic.CELLWIDTH * 11.5f) y = (int) (PacStatic.CELLWIDTH * 11.5f);
+                    y += Preferences.ghostSpeed;
+                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        halt();
+                        changeDir();
                     }
-                    //x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
+                        x++;
+                    }
+                    if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
+                        x--;
+                    }
                     return;
                 case Dir.RIGHT:
-                    x += Preferences.pacSpeed;
-                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (x > PacStatic.CELLWIDTH * 11.5f) x = (int) (PacStatic.CELLWIDTH * 11.5f);
+                    x += Preferences.ghostSpeed;
+                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        halt();
+                        changeDir();
                     }
-                    //y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
+                        y++;
+                    }
+                    if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
+                        y--;
+                    }
             }
-        }
-
-        private void up() {
-            nextDir = Dir.UP;
-        }
-
-        private void right() {
-            nextDir = Dir.RIGHT;
-        }
-
-        private void down() {
-            nextDir = Dir.DOWN;
-        }
-
-        private void halt() {
-            //nextDir = Dir.STOPPED;
-            dir = Dir.STOPPED;
-            //x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-            //y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-        }
-
-        private void left() {
-            nextDir = Dir.LEFT;
         }
     }
 
