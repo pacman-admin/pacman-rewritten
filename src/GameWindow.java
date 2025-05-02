@@ -8,6 +8,7 @@ import java.util.logging.Logger;
  * @author Langdon Staab
  * Rewriten 2025
  */
+
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
     private final Pellet[] pellets = new Pellet[78];
@@ -23,6 +24,7 @@ public final class GameWindow extends PApplet {
     private int pauseUntil;
     //private PImage maze_white;
     private PImage maze_blue;
+    private Pacman pacman = new Pacman();
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
@@ -34,6 +36,16 @@ public final class GameWindow extends PApplet {
 
     public void settings() {
         size(PacStatic.CELLWIDTH * 13 * Preferences.scale, PacStatic.CELLWIDTH * 13 * Preferences.scale);
+        noSmooth();
+    }
+
+    public void keyPressed() {
+        switch (keyCode) {
+            case UP, 87 -> pacman.up();
+            case RIGHT, 68 -> pacman.right();
+            case DOWN, 83 -> pacman.down();
+            case LEFT, 65 -> pacman.left();
+        }
     }
 
     private void calcTime() {
@@ -41,12 +53,10 @@ public final class GameWindow extends PApplet {
     }
 
     public void setup() {
-        ghosts = new Ghost[]{new Ghost(GhostType.BLINKY), new Ghost(GhostType.INKY), new Ghost(GhostType.PINKY)};
+        noStroke();
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
-        imageMode(CENTER);
-
-        noStroke();
+        ghosts = new Ghost[]{new Ghost(GhostType.BLINKY), new Ghost(GhostType.INKY), new Ghost(GhostType.PINKY)};
         int pelletCount = 0;
         for (int i = 1; i < PacStatic.MAP_DESIGN.length - 1; i++) {
             for (int j = 1; j < PacStatic.MAP_DESIGN[0].length - 1; j++) {
@@ -59,16 +69,9 @@ public final class GameWindow extends PApplet {
             }
         }
         pellets[77] = new Fruit(7, 1);
-        LOGGER.info("Bla" + time);
-        LOGGER.info("# of pellets: " + pelletCount);
+        imageMode(CENTER);
+        rectMode(CENTER);
         //maze_white = loadImage("maze_white.png");
-    }
-
-    private void updateWindowSize() {
-        surface.setResizable(true);
-        size(PacStatic.CELLWIDTH * 13 * Preferences.scale, PacStatic.CELLWIDTH * 13 * Preferences.scale);
-        surface.setResizable(false);
-        PacStatic.scaleWasChanged = false;
     }
 
     private void startGame() {
@@ -83,9 +86,9 @@ public final class GameWindow extends PApplet {
         if (first) {
             startMillis = millis();
             calcTime();
-            LOGGER.info("Game started.");
             startGame();
             first = false;
+            LOGGER.info("Game started!");
         }
 
         /*if (paused) {
@@ -97,7 +100,6 @@ public final class GameWindow extends PApplet {
             return;
         }*/
         if (first1) {
-            //new LoadingThread();
             first1 = false;
             for (Ghost g : ghosts) {
                 g.start();
@@ -110,6 +112,8 @@ public final class GameWindow extends PApplet {
         }
         drawPellets();
         drawGhosts();
+        pacman.move();
+        pacman.show();
     }
 
     private void drawPellets() {
@@ -136,9 +140,6 @@ public final class GameWindow extends PApplet {
         private final GameWindow.GhostSpriteContainer sprites;
         private final GhostType t;
         Random random = new Random();
-        private Dir dir;
-        private int coordsX;
-        private int coordsY;
 
         private Ghost(GhostType gT) {
             t = gT;
@@ -170,17 +171,14 @@ public final class GameWindow extends PApplet {
             dir = Dir.UP;
         }
 
-        private void stop() {
-            reset();
-        }
-
         private void move() {
             switch (dir) {
                 case Dir.UP:
+                    if (y < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
+                        y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     y -= Preferences.ghostSpeed;
-                    coordsY = ((int) (y) + PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
+                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 3) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                        LOGGER.info("Changing dir... Coordinates: " + coordsX + ", " + coordsY + "; pos: " + x + ", " + y);
                         changeDir();
                     }
                     if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
@@ -189,13 +187,13 @@ public final class GameWindow extends PApplet {
                     if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
                         x--;
                     }
-                    //x = (x + (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) / 2f;
                     return;
                 case Dir.LEFT:
+                    if (x < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
+                        x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     x -= Preferences.ghostSpeed;
-                    coordsX = ((int) (x) + PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
+                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 3) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                        LOGGER.info("Changing dir... Coordinates: " + coordsX + ", " + coordsY + "; pos: " + x + ", " + y);
                         changeDir();
                     }
                     if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
@@ -204,13 +202,12 @@ public final class GameWindow extends PApplet {
                     if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
                         y--;
                     }
-                    //y = (y + (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) / 2f;
                     return;
                 case Dir.DOWN:
+                    if (y > PacStatic.CELLWIDTH * 11.5f) y = (int) (PacStatic.CELLWIDTH * 11.5f);
                     y += Preferences.ghostSpeed;
-                    coordsY = ((int) (y) - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
+                    coordsY = (y - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                        LOGGER.info("Changing dir... Coordinates: " + coordsX + ", " + coordsY + "; pos: " + x + ", " + y);
                         changeDir();
                     }
                     if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
@@ -219,13 +216,12 @@ public final class GameWindow extends PApplet {
                     if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
                         x--;
                     }
-                    //x = (x + (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) / 2f;
                     return;
                 case Dir.RIGHT:
+                    if (x > PacStatic.CELLWIDTH * 11.5f) x = (int) (PacStatic.CELLWIDTH * 11.5f);
                     x += Preferences.ghostSpeed;
-                    coordsX = ((int) (x) - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
+                    coordsX = (x - PacStatic.HALF_CELLWIDTH) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                        LOGGER.info("Changing dir... Coordinates: " + coordsX + ", " + coordsY + "; pos: " + x + ", " + y);
                         changeDir();
                     }
                     if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
@@ -240,22 +236,142 @@ public final class GameWindow extends PApplet {
         private void changeDir() {
             switch (random.nextInt() % 4) {
                 case 0 -> {
-                    dir = Dir.UP;
-                    move();
+                    if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
+                        dir = Dir.UP;
+                        move();
+                        return;
+                    }
+                    changeDir();
                 }
                 case 1 -> {
-                    dir = Dir.RIGHT;
-                    move();
+                    if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
+                        dir = Dir.RIGHT;
+                        move();
+                        return;
+                    }
+                    changeDir();
                 }
                 case 2 -> {
-                    dir = Dir.DOWN;
-                    move();
+                    if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
+                        dir = Dir.DOWN;
+                        move();
+                        return;
+                    }
+                    changeDir();
                 }
                 case 3 -> {
-                    dir = Dir.LEFT;
-                    move();
+                    if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
+                        dir = Dir.LEFT;
+                        move();
+                        return;
+                    }
+                    changeDir();
                 }
             }
+        }
+    }
+
+    private class Pacman extends Entity {
+        private Dir nextDir;
+
+        @Override
+        void reset() {
+            dir = Dir.STOPPED;
+            nextDir = Dir.STOPPED;
+            x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            coordsX = 1;
+            coordsY = 1;
+        }
+
+        private void show() {
+            //fill(255, 255, 128+32);
+            fill(255, 64, 64);
+            //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
+            rect(x * Preferences.scale, y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
+        }
+
+        private void move() {
+            switch (nextDir) {
+                case Dir.UP:
+                    if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
+                        dir = nextDir;
+                    }
+                    break;
+                case Dir.LEFT:
+                    if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
+                        dir = nextDir;
+                    }
+                    break;
+                case Dir.DOWN:
+                    if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
+                        dir = nextDir;
+                    }
+                    break;
+                case Dir.RIGHT:
+                    if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
+                        dir = nextDir;
+                    }
+                    break;
+                default:
+                    return;
+            }
+            switch (dir) {
+                case Dir.UP:
+                    y -= Preferences.pacSpeed;
+                    coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
+                        halt();
+                    }
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
+                case Dir.LEFT:
+                    x -= Preferences.pacSpeed;
+                    coordsX = (x + PacStatic.HALF_CELLWIDTH - 3 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
+                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
+                        halt();
+                    }
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
+                case Dir.DOWN:
+                    y += Preferences.pacSpeed;
+                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 4)) / PacStatic.CELLWIDTH;
+                    if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
+                        halt();
+                    }
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
+                case Dir.RIGHT:
+                    x += Preferences.pacSpeed;
+                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 4)) / PacStatic.CELLWIDTH;
+                    if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
+                        halt();
+                    }
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            }
+        }
+
+        private void up() {
+            nextDir = Dir.UP;
+        }
+
+        private void right() {
+            nextDir = Dir.RIGHT;
+        }
+
+        private void down() {
+            nextDir = Dir.DOWN;
+        }
+
+        private void halt() {
+            nextDir = Dir.STOPPED;
+            dir = Dir.STOPPED;
+            x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+            y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+        }
+
+        private void left() {
+            nextDir = Dir.LEFT;
         }
     }
 
@@ -280,7 +396,7 @@ public final class GameWindow extends PApplet {
         }
 
         void handleDraw() {
-            circle(x * Preferences.scale, y * Preferences.scale, 14 * Preferences.scale);
+            ellipse(x * Preferences.scale, y * Preferences.scale, 14 * Preferences.scale, 14 * Preferences.scale);
         }
 
         private void show() {
@@ -351,7 +467,7 @@ public final class GameWindow extends PApplet {
         public void run() {
             switch (t) {
                 case GhostType.BLINKY:
-                    LOGGER.info("Loading sprites for Blinky...");
+                    //LOGGER.info("Loading sprites for Blinky...");
                     up[0] = loadImage("ghost/blinky/up.png");
                     up[1] = loadImage("ghost/blinky/up2.png");
                     right[0] = loadImage("ghost/blinky/right.png");
@@ -363,7 +479,7 @@ public final class GameWindow extends PApplet {
                     LOGGER.info("Loaded Blinky sprites!");
                     return;
                 case GhostType.INKY:
-                    LOGGER.info("Loading sprites for Inky...");
+                    //LOGGER.info("Loading sprites for Inky...");
                     up[0] = loadImage("ghost/inky/up.png");
                     up[1] = loadImage("ghost/inky/up2.png");
                     right[0] = loadImage("ghost/inky/right.png");
@@ -375,7 +491,7 @@ public final class GameWindow extends PApplet {
                     LOGGER.info("Loaded Inky sprites!");
                     return;
                 case GhostType.PINKY:
-                    LOGGER.info("Loading sprites for Pinky...");
+                    //LOGGER.info("Loading sprites for Pinky...");
                     up[0] = loadImage("ghost/pinky/up.png");
                     up[1] = loadImage("ghost/pinky/up2.png");
                     right[0] = loadImage("ghost/pinky/right.png");
