@@ -339,7 +339,7 @@ public final class GameWindow extends PApplet {
                     return;
                 case Dir.DOWN:
                     y += Preferences.pacSpeed;
-                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 4)) / PacStatic.CELLWIDTH;
+                    coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
                         halt();
                     }
@@ -347,7 +347,7 @@ public final class GameWindow extends PApplet {
                     return;
                 case Dir.RIGHT:
                     x += Preferences.pacSpeed;
-                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 4)) / PacStatic.CELLWIDTH;
+                    coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
                     if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
                         halt();
                     }
