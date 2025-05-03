@@ -37,7 +37,6 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
         p.add(createCheckbox("Debug", KeyEvent.VK_D, Preferences.debug));
         p.add(createCheckbox("Mute all sounds", KeyEvent.VK_M, Preferences.mute));
         p.add(createCheckbox("Play Pause Beat when paused", KeyEvent.VK_B, Preferences.playPauseBeat));
-        //p.add(createCheckbox("", KeyEvent.VK_, Preferences.));
         p.add(createSlider(4, Preferences.scale));
         p.add(new JLabel("Scale (enlarge size of everything)"));
         p.add(createSlider(10, Preferences.pacSpeed));
@@ -45,8 +44,6 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
         p.add(createSlider(10, Preferences.ghostSpeed));
         p.add(new JLabel("The Ghosts' speed"));
         p.add(createButton("Check for updates", KeyEvent.VK_U, "update"));
-        //p.add(createSlider(, ));
-        //p.add(new JLabel(""));
     }
 
     final JCheckBox createCheckbox(String title, int key, boolean selected) {
