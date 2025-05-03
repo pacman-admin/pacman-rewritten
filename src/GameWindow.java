@@ -29,7 +29,7 @@ public final class GameWindow extends PApplet {
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
-        SoundManager.preloadStartSound();
+        SoundManager.loopWhiteNoise();
         PApplet.main(new String[]{"GameWindow"});
         new LoadingThread();
         Runtime.getRuntime().addShutdownHook(new Thread(SoundManager::closeAll));

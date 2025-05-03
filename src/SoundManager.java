@@ -11,7 +11,6 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 
 final class SoundManager {
     private static final Logger LOGGER = LoggerFactory.createLogger(SoundManager.class.getName());
-    //private static final ExecutorService soundPlayer = newCachedThreadPool();
     private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(3);
     private static Clip pauseBeat;
     private static Clip wa;
@@ -45,6 +44,10 @@ final class SoundManager {
             LOGGER.warning("Error while loading sound\n" + e);
         }
     }
+    static void loopWhiteNoise(){
+        //loop inaudible white noise to fix Linux sound issues
+        soundPlayer.submit(new AsynchronousBlankClipLooper());
+    }
 
     static void play(Sound what) {
         soundPlayer.submit(new AsynchronousSoundPlayer(what));
@@ -56,40 +59,6 @@ final class SoundManager {
         LOGGER.info("Pause beat started");
     }
 
-    static void preloadStartSound() {
-        LOGGER.info("Playing Start Sound...");
-        Clip clip;
-        try {
-            clip = AudioSystem.getClip();
-        } catch (LineUnavailableException e) {
-            LOGGER.warning("Cannot play game start sound, line unavailable!");
-            return;
-        }
-        try {
-            InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
-            assert is != null;
-            clip.open(AudioSystem.getAudioInputStream(is));
-            while (!clip.isOpen()) {
-                LOGGER.info("Waiting for clip to open...");
-            }
-            clip.start();
-            while (!clip.isActive()) ;
-            while (clip.getFramePosition() == 0) {
-                LOGGER.info("Waiting for first frame to play...");
-            }
-            clip.close();
-            LOGGER.info("Start sound preloaded!");
-            return;
-        } catch (LineUnavailableException e) {
-            LOGGER.warning("Line Unavailable!\n" + e);
-        } catch (IOException e) {
-            LOGGER.warning("IOException while opening audio stream!\n" + e);
-        } catch (UnsupportedAudioFileException e) {
-            LOGGER.warning("Unsupported audio type!\n" + e);
-        }
-        clip.close();
-    }
-
     static void preload() {
         try {
             wa = AudioSystem.getClip();
@@ -99,7 +68,6 @@ final class SoundManager {
             Preferences.mute();
             throw new RuntimeException("Line Unavailable!" + e, e);
         }
-        soundPlayer.submit(new AsynchronousBlankClipLooper());
         openClip(wa, "DOT_1.wav");
         openClip(ka, "DOT_2.wav");
     }
@@ -132,10 +100,6 @@ final class SoundManager {
         LOGGER.info("All resources closed. Goodbye!");
     }
 
-    static void loopEmptyClip() {
-
-    }
-
     static void playStartSound() {
         Clip clip;
         try {
@@ -148,7 +112,9 @@ final class SoundManager {
             InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
             assert is != null;
             clip.open(AudioSystem.getAudioInputStream(is));
+            LOGGER.info("Waiting for start clip to open...");
             while (!clip.isOpen()) ;
+            LOGGER.info("Starting start sound...");
             clip.start();
             LOGGER.info("Start sound playing...");
             clip.drain();
@@ -163,14 +129,5 @@ final class SoundManager {
             LOGGER.warning("Unsupported audio type!\n" + e);
         }
         clip.close();
-    }
-
-    public void playClip(Clip clip, int loop) {
-        new Thread(() -> {
-            clip.setMicrosecondPosition(0);
-            clip.loop(loop);
-            clip.drain();
-            //clip.close();
-        }).start();
     }
 }

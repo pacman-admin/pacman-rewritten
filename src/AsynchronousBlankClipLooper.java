@@ -7,12 +7,11 @@ import java.io.InputStream;
 
 final class AsynchronousBlankClipLooper implements Runnable {
     public void run() {
-        System.out.println("Started white noise");
         //Constantly loop inaudible white noise to prevent buggy audio playing on Linux.
         try (Clip clip = AudioSystem.getClip(); InputStream is = AsynchronousBlankClipLooper.class.getResourceAsStream("SILENCE.wav")) {
             assert is != null;
-            System.out.println("Looping white noise...");
             clip.open(AudioSystem.getAudioInputStream(is));
+            System.out.println("Looping white noise...");
             clip.loop(-1);
             System.out.println("White noise is looping");
             clip.drain();
