@@ -11,7 +11,7 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 
 final class SoundManager {
     private static final Logger LOGGER = LoggerFactory.createLogger(SoundManager.class.getName());
-    private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(3);
+    private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(5);
     private static Clip pauseBeat;
     private static Clip wa;
     private static Clip ka;
@@ -38,13 +38,15 @@ final class SoundManager {
     private static void openClip(Clip c, String filename) {
         InputStream is = SoundManager.class.getResourceAsStream(filename);
         try {
+            assert is != null;
             c.open(AudioSystem.getAudioInputStream(is));
             is.close();
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             LOGGER.warning("Error while loading sound\n" + e);
         }
     }
-    static void loopWhiteNoise(){
+
+    static void loopWhiteNoise() {
         //loop inaudible white noise to fix Linux sound issues
         soundPlayer.submit(new AsynchronousBlankClipLooper());
     }
@@ -101,33 +103,14 @@ final class SoundManager {
     }
 
     static void playStartSound() {
-        Clip clip;
-        try {
-            clip = AudioSystem.getClip();
-        } catch (LineUnavailableException e) {
-            LOGGER.warning("Cannot play game start sound, line unavailable!");
-            return;
-        }
-        try {
-            InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
+        try (InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav"); Clip clip = AudioSystem.getClip()) {
             assert is != null;
             clip.open(AudioSystem.getAudioInputStream(is));
-            LOGGER.info("Waiting for start clip to open...");
             while (!clip.isOpen()) ;
-            LOGGER.info("Starting start sound...");
             clip.start();
-            LOGGER.info("Start sound playing...");
             clip.drain();
-            clip.close();
-            LOGGER.info("Start sound finished.");
-            return;
-        } catch (LineUnavailableException e) {
-            LOGGER.warning("Line Unavailable!\n" + e);
-        } catch (IOException e) {
-            LOGGER.warning("IOException while opening audio stream!\n" + e);
-        } catch (UnsupportedAudioFileException e) {
-            LOGGER.warning("Unsupported audio type!\n" + e);
+        } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+            LOGGER.warning("Error while playing start sound\n" + e);
         }
-        clip.close();
     }
 }

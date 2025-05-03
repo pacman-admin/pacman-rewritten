@@ -26,6 +26,7 @@ final class AsynchronousSoundPlayer implements Runnable {
             clip.start();
             clip.drain();
         } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

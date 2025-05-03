@@ -1,8 +1,8 @@
 import processing.core.PApplet;
 import processing.core.PImage;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 /**
@@ -12,20 +12,19 @@ import java.util.logging.Logger;
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
     private final Pickup[] pellets = new Pickup[78];
+    private final Pacman pacman = new Pacman();
     private ShowableGhost[] ghosts;
     private boolean first = true;
-    private boolean first1 = true;
     private int pelletsEaten = 0;
     private int score = 0;
+    private boolean scoreIncreased = false;
     //private boolean paused;
-    private int level = 2;
-    private int startMillis;
-    private int time;
-    private int pauseUntil;
+    private int level = 0;
+    private int highScore;
     //private boolean dying = false;
     //private PImage maze_white;
     private PImage maze_blue;
-    private final Pacman pacman = new Pacman();
+    private boolean awaitingStart = true;
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
@@ -50,10 +49,6 @@ public final class GameWindow extends PApplet {
         }
     }
 
-    private void calcTime() {
-        time = millis() - startMillis;
-    }
-
     public void setup() {
         noStroke();
         maze_blue = loadImage("maze_blue.png");
@@ -73,40 +68,54 @@ public final class GameWindow extends PApplet {
         pellets[77] = new Fruit(7, 1);
         imageMode(CENTER);
         rectMode(CENTER);
+
         //maze_white = loadImage("maze_white.png");
     }
 
     private void startGame() {
-        pauseUntil = time + 4500;
+        new DelayedConcurrentExecutor("Delayed game start handler", 4500) {
+            @Override
+            void task() {
+                for (Ghost g : ghosts) {
+                    g.start();
+                }
+                awaitingStart = false;
+            }
+        };
         if (!first || Preferences.mute) {
             return;
         }
+        new ConcurrentRepeatingExecutor("Asynchnous recorder of high score", 20000, 15000) {
+            void task() {
+                if (scoreIncreased) {
+                    scoreIncreased = false;
+                    if (score > highScore) {
+                        highScore = score;
+                    }
+                    if (highScore > PacStatic.prevHighScore) {
+                        try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
+                            writer.println(highScore);
+                            LOGGER.info("Saved high score");
+                        } catch (FileNotFoundException e) {
+                            LOGGER.warning("Error while saving high score\n" + e);
+                        }
+                    }
+                }
+            }
+        };
         SoundManager.playStartSound();
     }
 
     public void draw() {
         if (first) {
-            startMillis = millis();
-            calcTime();
             startGame();
             first = false;
             LOGGER.info("Game started!");
         }
-        /*if (paused) {
-            return;
-        }*/
-        calcTime();
+
         image(maze_blue, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
-        if (time < pauseUntil) {
+        if (awaitingStart) {
             return;
-        }
-        if (first1) {
-            pacman.freeze();
-            first1 = false;
-            for (Ghost g : ghosts) {
-                g.start();
-            }
-            pacman.reset();
         }
         drawPellets();
         drawGhosts();
@@ -132,15 +141,23 @@ public final class GameWindow extends PApplet {
     private void drawGhosts() {
         final int whichSprite = (frameCount % 50 < 26) ? 0 : 1;
         for (ShowableGhost g : ghosts) {
-            if(g.isTouching(pacman.x, pacman.y)){
-                pauseUntil = 2000 + time;
+            if (g.isTouching(pacman.x, pacman.y)) {
+                awaitingStart = true;
                 SoundManager.play(Sound.DEATH);
                 pacman.freeze();
-                first1 = true;
-                for(Ghost ghost : ghosts){
+                for (Ghost ghost : ghosts) {
                     ghost.reset();
                 }
                 pacman.freeze();
+                new DelayedConcurrentExecutor("Delayed post-death reset handler", 2000) {
+                    void task() {
+                        for (Ghost ghost1 : ghosts) {
+                            ghost1.start();
+                        }
+                        pacman.reset();
+                        awaitingStart = false;
+                    }
+                };
                 return;
             }
             g.move();
@@ -168,23 +185,29 @@ public final class GameWindow extends PApplet {
         }
 
         void increaseScore() {
+            scoreIncreased = true;
             SoundManager.waka();
             score += 10;
             if (pelletsEaten > 75) {
-                pauseUntil = 2000 + time;
+                awaitingStart = true;
                 pacman.freeze();
-                first1 = true;
                 pacman.freeze();
                 pelletsEaten = 0;
                 level++;
-                new Timer("Delayed pellet reset handler").schedule(new TimerTask() {
-                    @Override
-                    public void run() {
+                new DelayedConcurrentExecutor("Delayed pellet reset handler", 1000) {
+                    void task() {
+                        pacman.freeze();
                         for (Pickup p : pellets) {
                             p.reset();
                         }
+                        for (Ghost g : ghosts) {
+                            g.start();
+                        }
+                        pacman.reset();
+                        pacman.freeze();
+                        awaitingStart = false;
                     }
-                },1000);
+                };
                 return;
             }
             pelletsEaten++;
