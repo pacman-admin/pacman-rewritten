@@ -22,10 +22,8 @@ public final class GameWindow extends PApplet {
     private int pelletsEaten = 0;
     private int score = 0;
     private boolean scoreIncreased = false;
-    //private boolean paused;
     private int level = 0;
     private int highScore;
-    //private boolean dying = false;
     //private PImage maze_white;
     private PImage maze_blue;
     private boolean awaitingStart = true;
@@ -41,7 +39,6 @@ public final class GameWindow extends PApplet {
 
     public void settings() {
         size(PacStatic.CELLWIDTH * 13 * Preferences.scale, PacStatic.CELLWIDTH * 13 * Preferences.scale);
-        noSmooth();
     }
 
     public void keyPressed() {
