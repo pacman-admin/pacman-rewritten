@@ -25,7 +25,7 @@ public final class GameWindow extends PApplet {
     //private boolean dying = false;
     //private PImage maze_white;
     private PImage maze_blue;
-    private Pacman pacman = new Pacman();
+    private final Pacman pacman = new Pacman();
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
