@@ -7,10 +7,15 @@ import java.io.InputStream;
 
 final class AsynchronousBlankClipLooper implements Runnable {
     public void run() {
-        try (Clip clip = AudioSystem.getClip(); InputStream is = AsynchronousBlankClipLooper.class.getResourceAsStream("DEATH.wav")) {
+        System.out.println("Started white noise");
+        //Constantly loop inaudible white noise to prevent buggy audio playing on Linux.
+        try (Clip clip = AudioSystem.getClip(); InputStream is = AsynchronousBlankClipLooper.class.getResourceAsStream("SILENCE.wav")) {
             assert is != null;
+            System.out.println("Looping white noise...");
             clip.open(AudioSystem.getAudioInputStream(is));
             clip.loop(-1);
+            System.out.println("White noise is looping");
+            clip.drain();
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }

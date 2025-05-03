@@ -85,10 +85,10 @@ class Ghost extends Entity {
                     changeDir();
                 }
                 if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                    x++;
+                    x += Preferences.ghostSpeed;
                 }
                 if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                    x--;
+                    x -= Preferences.ghostSpeed;
                 }
                 return;
             case Dir.LEFT:
@@ -100,10 +100,10 @@ class Ghost extends Entity {
                     changeDir();
                 }
                 if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                    y++;
+                    y += Preferences.ghostSpeed;
                 }
                 if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                    y--;
+                    y -= Preferences.ghostSpeed;
                 }
                 return;
             case Dir.DOWN:
@@ -114,10 +114,10 @@ class Ghost extends Entity {
                     changeDir();
                 }
                 if (x < (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                    x++;
+                    x += Preferences.ghostSpeed;
                 }
                 if (x > (PacStatic.CELLWIDTH * coordsX + PacStatic.HALF_CELLWIDTH)) {
-                    x--;
+                    x -= Preferences.ghostSpeed;
                 }
                 return;
             case Dir.RIGHT:
@@ -128,10 +128,10 @@ class Ghost extends Entity {
                     changeDir();
                 }
                 if (y < (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                    y++;
+                    y += Preferences.ghostSpeed;
                 }
                 if (y > (PacStatic.CELLWIDTH * coordsY + PacStatic.HALF_CELLWIDTH)) {
-                    y--;
+                    y -= Preferences.ghostSpeed;
                 }
         }
     }

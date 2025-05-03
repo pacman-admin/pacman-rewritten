@@ -67,6 +67,7 @@ final class SoundManager {
         }
         try {
             InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
+            assert is != null;
             clip.open(AudioSystem.getAudioInputStream(is));
             while (!clip.isOpen()) {
                 LOGGER.info("Waiting for clip to open...");
@@ -89,7 +90,6 @@ final class SoundManager {
         clip.close();
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     static void preload() {
         try {
             wa = AudioSystem.getClip();
@@ -100,32 +100,9 @@ final class SoundManager {
             throw new RuntimeException("Line Unavailable!" + e, e);
         }
         soundPlayer.submit(new AsynchronousBlankClipLooper());
-        while (soundPlayer.getActiveCount() > 1) ;
         openClip(wa, "DOT_1.wav");
-        wa.start();
-        while (!wa.isActive()) ;
-        while (wa.available() < 96000) ;
-        while (wa.getFramePosition() == 0) ;
-        wa.stop();
-        while (soundPlayer.getActiveCount() > 1) ;
         openClip(ka, "DOT_2.wav");
-        ka.start();
-        while (!ka.isActive()) ;
-        while (ka.available() < 96000) ;
-        while (ka.getFramePosition() == 0) ;
-        ka.stop();
-        new Thread(() -> {
-            while (soundPlayer.getActiveCount() > 1) ;
-            soundPlayer.submit(new AsynchronousSoundPreloader(Sound.DEATH));
-            while (soundPlayer.getActiveCount() > 1) ;
-            soundPlayer.submit(new AsynchronousSoundPreloader(Sound.EXTRA_LIFE));
-            while (soundPlayer.getActiveCount() > 1) ;
-            soundPlayer.submit(new AsynchronousSoundPreloader(Sound.FRUIT));
-            while (soundPlayer.getActiveCount() > 1) ;
-            soundPlayer.submit(new AsynchronousSoundPreloader(Sound.PAUSE));
-        }).start();
     }
-
 
     static void waka() {
         soundPlayer.submit(() -> {
@@ -169,6 +146,7 @@ final class SoundManager {
         }
         try {
             InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav");
+            assert is != null;
             clip.open(AudioSystem.getAudioInputStream(is));
             while (!clip.isOpen()) ;
             clip.start();
@@ -185,5 +163,14 @@ final class SoundManager {
             LOGGER.warning("Unsupported audio type!\n" + e);
         }
         clip.close();
+    }
+
+    public void playClip(Clip clip, int loop) {
+        new Thread(() -> {
+            clip.setMicrosecondPosition(0);
+            clip.loop(loop);
+            clip.drain();
+            //clip.close();
+        }).start();
     }
 }
