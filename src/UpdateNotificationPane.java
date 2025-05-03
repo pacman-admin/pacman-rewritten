@@ -1,4 +1,4 @@
-import java.util.logging.Logger;
+import javax.swing.*;
 
 /**
  * Copyright 2024-2025 Langdon Staab
@@ -8,23 +8,28 @@ import java.util.logging.Logger;
  *
  * @author Langdon Staab
  */
-final class LoadingThread extends Thread {
-    private static final Logger LOGGER = LoggerFactory.createLogger(LoadingThread.class.getName());
-
-    LoadingThread() {
-        start();
+public class UpdateNotificationPane extends Window {
+    private UpdateNotificationPane() {
+        title = "A New Update is Available!";
     }
 
-    public void run() {
-        Preferences.load();
-        LOGGER.info("Loaded saved Preferences from filesystem.");
-        if (!Preferences.mute) {
-            SoundManager.preload();
-        }
-        if (Preferences.autoUpdate) {
-            UpdateMgr.checkForUpdate();
-        }
-        PreferencePane.launch();
-        LOGGER.info("Thread finished!");
+    private static void runInit() {
+        init(new UpdateNotificationPane());
+    }
+
+    static void launch() {
+        javax.swing.SwingUtilities.invokeLater(UpdateNotificationPane::runInit);
+    }
+
+    final void main(JPanel p) {
+        p.add(new JLabel("A new Version of Pac-Man has been released!"));
+        p.add(new JLabel("Current Version: " + PacStatic.VERSION));
+        p.add(new JLabel("New Version: " + UpdateMgr.getLatestVersion()));
+        p.add(new JLabel(""));
+        p.add(new JLabel(""));
+        p.add(new JLabel(""));
+        p.add(new JLabel(""));
+        p.add(new JLabel(""));
+        p.add(new JLabel(""));
     }
 }

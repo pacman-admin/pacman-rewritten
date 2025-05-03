@@ -23,13 +23,12 @@ public class InfoPane extends Window {
 
     final void main(JPanel p) {
         p.add(new JLabel("Pac-Man version " + PacStatic.VERSION));
-        p.add(new JLabel("Coded by Langdon Staab"));
         p.add(new JLabel(""));
+        p.add(new JLabel("This program makes use of the Processing core library,"));
+        p.add(new JLabel("licensed under the LGPL v2.1"));
         p.add(new JLabel(""));
+        p.add(new JLabel("This program is licensed under the MIT (aka. Expat) license"));
         p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
+        p.add(new JLabel("Be aware that this game, in all its simplicity, is surprisingly addictive"));
     }
 }
