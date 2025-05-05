@@ -134,6 +134,7 @@ final class Pacman extends Entity {
     }
 
     void freeze() {
+        mouthOpenAngle = (float) PI;
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;
     }
