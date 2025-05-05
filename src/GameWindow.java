@@ -69,7 +69,6 @@ public final class GameWindow extends PApplet {
         pellets[77] = new Fruit(7, 1);
         imageMode(CENTER);
         rectMode(CENTER);
-
         //maze_white = loadImage("maze_white.png");
     }
 
@@ -83,10 +82,8 @@ public final class GameWindow extends PApplet {
                 awaitingStart = false;
             }
         };
-        if (!first || Preferences.mute) {
-            return;
-        }
-        new ConcurrentRepeatingExecutor("Asynchnous recorder of high score", 20000, 15000) {
+        if (!first) return;
+        new ConcurrentRepeatingExecutor("Asynchronous recorder of high score", 20000, 15000) {
             void task() {
                 if (scoreIncreased) {
                     scoreIncreased = false;

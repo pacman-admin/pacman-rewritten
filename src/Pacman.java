@@ -7,9 +7,12 @@
  * @author Langdon Staab
  */
 final class Pacman extends Entity {
+    private final static int stopBuffer = 2;
     private Dir nextDir;
 
     void move() {
+        coordsX = Math.round((float) x / PacStatic.CELLWIDTH + 0.5f) - 1;
+        coordsY = Math.round((float) y / PacStatic.CELLWIDTH + 0.5f) - 1;
         switch (nextDir) {
             case Dir.UP:
                 if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
@@ -40,28 +43,40 @@ final class Pacman extends Entity {
         }
         switch (dir) {
             case Dir.UP:
-                y -= Preferences.pacSpeed;
-                coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
-                if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
-                    halt();
+                if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
+                    y -= Preferences.pacSpeed;
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
                 }
-                x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (y <= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
+                    halt();
+                    return;
+                }
+                y -= Preferences.pacSpeed;
                 return;
             case Dir.LEFT:
-                x -= Preferences.pacSpeed;
-                coordsX = (x + PacStatic.HALF_CELLWIDTH - 3 - (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
-                if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
-                    halt();
+                if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
+                    x -= Preferences.pacSpeed;
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
                 }
-                y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (x <= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
+                    halt();
+                    return;
+                }
+                x -= Preferences.pacSpeed;
                 return;
             case Dir.DOWN:
-                y += Preferences.pacSpeed;
-                coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
-                if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
-                    halt();
+                if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
+                    y += Preferences.pacSpeed;
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
                 }
-                x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (y >= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
+                    halt();
+                    return;
+                }
+                y += Preferences.pacSpeed;
                 return;
             case Dir.RIGHT:
                 x += Preferences.pacSpeed;
