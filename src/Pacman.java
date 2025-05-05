@@ -33,24 +33,28 @@ final class Pacman extends Entity {
         switch (nextDir) {
             case Dir.UP:
                 if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     dir = Dir.UP;
                     break;
                 }
                 break;
             case Dir.LEFT:
                 if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     dir = Dir.LEFT;
                     break;
                 }
                 break;
             case Dir.DOWN:
                 if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     dir = Dir.DOWN;
                     break;
                 }
                 break;
             case Dir.RIGHT:
                 if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     dir = Dir.RIGHT;
                     break;
                 }
@@ -63,11 +67,9 @@ final class Pacman extends Entity {
                 if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
                     y -= Preferences.pacSpeed;
                     chomp();
-                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 if (y <= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
-                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
@@ -78,12 +80,10 @@ final class Pacman extends Entity {
                 if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
                     x -= Preferences.pacSpeed;
                     chomp();
-                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 if (x <= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
                     x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 x -= Preferences.pacSpeed;
@@ -93,11 +93,9 @@ final class Pacman extends Entity {
                 if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
                     y += Preferences.pacSpeed;
                     chomp();
-                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 if (y >= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
-                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
@@ -108,12 +106,10 @@ final class Pacman extends Entity {
                 if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
                     x += Preferences.pacSpeed;
                     chomp();
-                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 if (x >= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
                     x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 x += Preferences.pacSpeed;
