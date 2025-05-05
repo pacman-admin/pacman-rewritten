@@ -151,6 +151,5 @@ final class Pacman extends Entity {
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;
         mouthOpening = true;
-        mouthOpenAngle = (float) PI;
     }
 }
