@@ -135,10 +135,17 @@ public final class GameWindow extends PApplet {
     }
 
     private void showPacman() {
-        //fill(255, 255, 128+32);
-        fill(255, 64, 64);
+        fill(255, 255, 128 + 32);
+        //fill(255, 64, 64);
+        translate(pacman.x, pacman.y);
+        switch (pacman.dir) {
+            case Dir.UP -> rotate(HALF_PI);
+            case Dir.DOWN -> rotate(PI+HALF_PI);
+            case Dir.RIGHT -> rotate(PI);
+        }
+        arc(0, 0, PacStatic.CELLWIDTH - 2, PacStatic.CELLWIDTH - 2, -pacman.mouthOpenAngle, pacman.mouthOpenAngle);
         //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
-        rect(pacman.x * Preferences.scale, pacman.y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
+        //rect(pacman.x * Preferences.scale, pacman.y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
     }
 
     private void drawGhosts() {

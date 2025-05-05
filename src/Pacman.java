@@ -1,3 +1,5 @@
+import static java.lang.Math.PI;
+
 /**
  * Copyright 2024-2025 Langdon Staab
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -7,8 +9,23 @@
  * @author Langdon Staab
  */
 final class Pacman extends Entity {
-    private final static int stopBuffer = 2;
+    float mouthOpenAngle;
     private Dir nextDir;
+    private boolean mouthOpening;
+
+    void chomp() {
+        if (mouthOpening) {
+            mouthOpenAngle += PacStatic.CHOMP_SPEED;
+            if (mouthOpenAngle >= PI) {
+                mouthOpening = false;
+            }
+            return;
+        }
+        mouthOpenAngle -= PacStatic.CHOMP_SPEED;
+        if (mouthOpenAngle <= 3 * PI / 4) {
+            mouthOpening = true;
+        }
+    }
 
     void move() {
         coordsX = Math.round((float) x / PacStatic.CELLWIDTH + 0.5f) - 1;
@@ -45,46 +62,62 @@ final class Pacman extends Entity {
             case Dir.UP:
                 if (PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
                     y -= Preferences.pacSpeed;
+                    chomp();
                     x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
-                if (y <= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
-                    halt();
+                if (y <= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 y -= Preferences.pacSpeed;
+                chomp();
                 return;
             case Dir.LEFT:
                 if (PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
                     x -= Preferences.pacSpeed;
+                    chomp();
                     y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
-                if (x <= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
-                    halt();
+                if (x <= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 x -= Preferences.pacSpeed;
+                chomp();
                 return;
             case Dir.DOWN:
                 if (PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
                     y += Preferences.pacSpeed;
+                    chomp();
                     x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
-                if (y >= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH + stopBuffer) {
-                    halt();
+                if (y >= coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                     return;
                 }
                 y += Preferences.pacSpeed;
+                chomp();
                 return;
             case Dir.RIGHT:
-                x += Preferences.pacSpeed;
-                coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.pacSpeed / 3)) / PacStatic.CELLWIDTH;
-                if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
-                    halt();
+                if (PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
+                    x += Preferences.pacSpeed;
+                    chomp();
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
                 }
-                y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (x >= coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH) {
+                    x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                    return;
+                }
+                x += Preferences.pacSpeed;
+                chomp();
         }
     }
 
@@ -104,23 +137,20 @@ final class Pacman extends Entity {
         nextDir = Dir.LEFT;
     }
 
-    void halt() {
-        dir = Dir.STOPPED;
-        x = coordsX * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-        y = coordsY * PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
-    }
-
     void freeze() {
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;
     }
 
     void reset() {
-        dir = Dir.STOPPED;
-        nextDir = Dir.STOPPED;
+        mouthOpenAngle = (float) PI;
         x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
         y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
         coordsX = 1;
         coordsY = 1;
+        dir = Dir.STOPPED;
+        nextDir = Dir.STOPPED;
+        mouthOpening = true;
+        mouthOpenAngle = (float) PI;
     }
 }

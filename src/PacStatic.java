@@ -1,3 +1,5 @@
+import static java.lang.Math.PI;
+
 /**
  * Copyright 2024-2025 Langdon Staab
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -15,6 +17,7 @@ class PacStatic {
     final static boolean[][] MAP_DESIGN = {{false, false, false, false, false, false, false, false, false, false, false, false, false}, {false, true, false, true, true, true, true, true, true, true, true, true, false}, {false, true, true, true, false, false, false, false, false, false, false, true, false}, {false, true, false, true, true, true, true, true, true, true, false, true, false}, {false, true, false, true, false, false, false, false, false, true, false, true, false}, {false, true, true, true, true, true, true, true, true, true, true, true, false}, {false, true, false, true, false, true, false, false, true, false, true, true, false}, {false, true, false, true, false, true, false, true, true, false, true, true, false}, {false, true, false, true, true, true, true, false, true, false, false, true, false}, {false, true, false, false, false, true, false, false, true, false, true, true, false}, {false, true, true, true, true, true, true, false, true, false, true, true, false}, {false, true, true, false, false, false, true, true, true, false, true, true, false}, {false, false, false, false, false, false, false, false, false, false, false, false, false}};
     static int prevHighScore;
     static boolean scaleWasChanged = false;
+    static float CHOMP_SPEED = (float) (PI / 36);
 
     static int getFruitID(int level) {
         switch (level) {
