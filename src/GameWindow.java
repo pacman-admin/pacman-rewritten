@@ -3,6 +3,8 @@ import processing.core.PImage;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -24,7 +26,8 @@ public final class GameWindow extends PApplet {
     private boolean scoreIncreased = false;
     private int level = 0;
     private int highScore;
-    //private PImage maze_white;
+    private PImage currentMazeImg;
+    private PImage maze_white;
     private PImage maze_blue;
     private boolean awaitingStart = true;
 
@@ -54,6 +57,8 @@ public final class GameWindow extends PApplet {
         noStroke();
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
+        pacman.freeze();
+        currentMazeImg = maze_blue;
         ghosts = new ShowableGhost[]{new ShowableGhost(GhostType.BLINKY), new ShowableGhost(GhostType.INKY), new ShowableGhost(GhostType.PINKY)};
         int pelletCount = 0;
         for (int i = 1; i < PacStatic.MAP_DESIGN.length - 1; i++) {
@@ -69,7 +74,7 @@ public final class GameWindow extends PApplet {
         pellets[77] = new Fruit(7, 1);
         imageMode(CENTER);
         rectMode(CENTER);
-        //maze_white = loadImage("maze_white.png");
+        maze_white = loadImage("maze_white.png");
     }
 
     private void startGame() {
@@ -111,7 +116,7 @@ public final class GameWindow extends PApplet {
             LOGGER.info("Game started!");
         }
 
-        image(maze_blue, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
+        image(currentMazeImg, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
         if (awaitingStart) {
             return;
         }
@@ -189,12 +194,58 @@ public final class GameWindow extends PApplet {
             if (pelletsEaten > 75) {
                 awaitingStart = true;
                 pacman.freeze();
-                pacman.freeze();
                 pelletsEaten = 0;
                 level++;
-                new DelayedConcurrentExecutor("Delayed pellet reset handler", 1000) {
-                    void task() {
+                currentMazeImg = maze_white;
+                Timer t = new Timer("Pellet update and maze flash handler");
+                pacman.freeze();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
                         pacman.freeze();
+                        currentMazeImg = maze_blue;
+                    }
+                }, 250);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_white;
+                    }
+                }, 500);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_blue;
+                    }
+                }, 750);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_white;
+                    }
+                }, 1000);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_blue;
+                    }
+                }, 1250);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_white;
+                    }
+                }, 1500);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
+                        currentMazeImg = maze_blue;
                         for (Pickup p : pellets) {
                             p.reset();
                         }
@@ -203,9 +254,15 @@ public final class GameWindow extends PApplet {
                         }
                         pacman.reset();
                         pacman.freeze();
+                    }
+                }, 1750);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        pacman.freeze();
                         awaitingStart = false;
                     }
-                };
+                }, 2000);
                 return;
             }
             pelletsEaten++;
