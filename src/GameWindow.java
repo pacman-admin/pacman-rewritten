@@ -73,6 +73,8 @@ public final class GameWindow extends PApplet {
                 }
             }
         }
+        textAlign(CENTER, CENTER);
+        textFont(createFont("minecraft-seven-classic/minecraft-seven-classic.ttf", 8, false));
         pellets[77] = new Fruit(7, 1);
         imageMode(CENTER);
         rectMode(CENTER);
@@ -130,6 +132,7 @@ public final class GameWindow extends PApplet {
         if (awaitingStart) {
             return;
         }
+        showScores();
         drawPellets();
         drawGhosts();
         showLives();
@@ -157,6 +160,11 @@ public final class GameWindow extends PApplet {
         arc(0, 0, PacStatic.CELLWIDTH - 2, PacStatic.CELLWIDTH - 2, -pacman.mouthOpenAngle, pacman.mouthOpenAngle);
         //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
         //rect(pacman.x * Preferences.scale, pacman.y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
+    }
+
+    private void showScores() {
+        fill(255);
+        text("Score: " + score + "\nHIGH SCORE " + Math.max(PacStatic.prevHighScore, highScore), 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
     }
 
     private void showLives() {

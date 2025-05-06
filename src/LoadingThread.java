@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -24,6 +28,15 @@ final class LoadingThread extends Thread {
         if (Preferences.autoUpdate) {
             UpdateMgr.checkForUpdate();
         }
+        try (BufferedReader reader = new BufferedReader(new FileReader(PacStatic.PATH + "/highscore.txt"))) {
+            PacStatic.prevHighScore = Math.max(0, Integer.parseInt(reader.readLine()));
+            LOGGER.info("Saved high score");
+        } catch (FileNotFoundException e) {
+            LOGGER.warning("Error while saving high score\n" + e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         PreferencePane.launch();
         LOGGER.info("Thread finished!");
     }
