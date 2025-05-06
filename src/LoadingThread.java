@@ -29,14 +29,13 @@ final class LoadingThread extends Thread {
             UpdateMgr.checkForUpdate();
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(PacStatic.PATH + "/highscore.txt"))) {
-            PacStatic.prevHighScore = Math.max(0, Integer.parseInt(reader.readLine()));
+            PacStatic.highScore = Math.max(0, Integer.parseInt(reader.readLine()));
             LOGGER.info("Saved high score");
         } catch (FileNotFoundException e) {
             LOGGER.warning("Error while saving high score\n" + e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         PreferencePane.launch();
         LOGGER.info("Thread finished!");
     }

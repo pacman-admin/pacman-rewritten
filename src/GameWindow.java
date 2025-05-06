@@ -26,12 +26,12 @@ public final class GameWindow extends PApplet {
     private int score = 0;
     private boolean scoreIncreased = false;
     private int level = 0;
-    private int highScore;
     private PImage currentMazeImg;
     private PImage maze_white;
     private PImage maze_blue;
     private boolean awaitingStart = true;
     private int lives = 2;
+    private int spriteNum = 0;
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
@@ -104,18 +104,25 @@ public final class GameWindow extends PApplet {
             void task() {
                 if (scoreIncreased) {
                     scoreIncreased = false;
-                    if (score > highScore) {
-                        highScore = score;
+                    if (score > PacStatic.highScore) {
+                        PacStatic.highScore = score;
                     }
-                    if (highScore > PacStatic.prevHighScore) {
-                        try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
-                            writer.println(highScore);
-                            LOGGER.info("Saved high score");
-                        } catch (FileNotFoundException e) {
-                            LOGGER.warning("Error while saving high score\n" + e);
-                        }
+                    try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
+                        writer.println(PacStatic.highScore);
+                        LOGGER.info("Saved high score");
+                    } catch (FileNotFoundException e) {
+                        LOGGER.warning("Error while saving high score\n" + e);
                     }
                 }
+            }
+        };
+        new ConcurrentRepeatingExecutor("Asynchronous ghost sprite toggler", 4500, 320) {
+            void task() {
+                if (spriteNum == 0) {
+                    spriteNum = 1;
+                    return;
+                }
+                spriteNum = 0;
             }
         };
         SoundManager.playStartSound();
@@ -164,7 +171,7 @@ public final class GameWindow extends PApplet {
 
     private void showScores() {
         fill(255);
-        text("Score: " + score + "\nHIGH SCORE " + Math.max(PacStatic.prevHighScore, highScore), 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
+        text("Score: " + score + "\nHIGH SCORE " + PacStatic.highScore, 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
     }
 
     private void showLives() {
@@ -175,7 +182,6 @@ public final class GameWindow extends PApplet {
     }
 
     private void drawGhosts() {
-        final int whichSprite = (frameCount % 50 < 26) ? 0 : 1;
         for (ShowableGhost g : ghosts) {
             if (g.isTouching(pacman.x, pacman.y)) {
                 awaitingStart = true;
@@ -199,10 +205,10 @@ public final class GameWindow extends PApplet {
             }
             g.move();
             switch (g.dir) {
-                case Dir.UP -> image(g.sprites.up[whichSprite], g.x, g.y);
-                case Dir.RIGHT -> image(g.sprites.right[whichSprite], g.x, g.y);
-                case Dir.DOWN -> image(g.sprites.down[whichSprite], g.x, g.y);
-                case Dir.LEFT -> image(g.sprites.left[whichSprite], g.x, g.y);
+                case Dir.UP -> image(g.sprites.up[spriteNum], g.x, g.y);
+                case Dir.RIGHT -> image(g.sprites.right[spriteNum], g.x, g.y);
+                case Dir.DOWN -> image(g.sprites.down[spriteNum], g.x, g.y);
+                case Dir.LEFT -> image(g.sprites.left[spriteNum], g.x, g.y);
             }
         }
     }
