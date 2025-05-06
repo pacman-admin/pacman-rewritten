@@ -17,6 +17,7 @@ import java.util.logging.Logger;
  */
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
+    private static int minScoreExtraLife = 1000;
     private final Pickup[] pellets = new Pickup[78];
     private final Pacman pacman = new Pacman();
     private ShowableGhost[] ghosts;
@@ -30,6 +31,7 @@ public final class GameWindow extends PApplet {
     private PImage maze_white;
     private PImage maze_blue;
     private boolean awaitingStart = true;
+    private int lives = 2;
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
@@ -77,6 +79,14 @@ public final class GameWindow extends PApplet {
         maze_white = loadImage("maze_white.png");
     }
 
+    private void giveExtraLife() {
+        if (score >= minScoreExtraLife) {
+            minScoreExtraLife *= 2;
+            lives++;
+            SoundManager.play(Sound.EXTRA_LIFE);
+        }
+    }
+
     private void startGame() {
         new DelayedConcurrentExecutor("Delayed game start handler", 4500) {
             @Override
@@ -122,6 +132,7 @@ public final class GameWindow extends PApplet {
         }
         drawPellets();
         drawGhosts();
+        showLives();
         pacman.move();
         showPacman();
     }
@@ -135,17 +146,24 @@ public final class GameWindow extends PApplet {
     }
 
     private void showPacman() {
-        fill(255, 255, 128 + 32);
+        //fill(255, 255, 128 + 32);
         //fill(255, 64, 64);
         translate(pacman.x, pacman.y);
         switch (pacman.dir) {
             case Dir.UP -> rotate(HALF_PI);
-            case Dir.DOWN -> rotate(PI+HALF_PI);
+            case Dir.DOWN -> rotate(PI + HALF_PI);
             case Dir.RIGHT -> rotate(PI);
         }
         arc(0, 0, PacStatic.CELLWIDTH - 2, PacStatic.CELLWIDTH - 2, -pacman.mouthOpenAngle, pacman.mouthOpenAngle);
         //ellipse(x * Preferences.scale, y * Preferences.scale, 28 * Preferences.scale, 28 * Preferences.scale);
         //rect(pacman.x * Preferences.scale, pacman.y * Preferences.scale, PacStatic.CELLWIDTH, PacStatic.CELLWIDTH);
+    }
+
+    private void showLives() {
+        fill(255, 255, 128 + 32);
+        for (int i = 0; i < lives; i++) {
+            arc((i + 1) * 20, height - PacStatic.HALF_CELLWIDTH, 16, 16, PI / 8, PI * 15 / 8);
+        }
     }
 
     private void drawGhosts() {
@@ -154,6 +172,7 @@ public final class GameWindow extends PApplet {
             if (g.isTouching(pacman.x, pacman.y)) {
                 awaitingStart = true;
                 SoundManager.play(Sound.DEATH);
+                lives--;
                 pacman.freeze();
                 for (Ghost ghost : ghosts) {
                     ghost.reset();
@@ -273,7 +292,7 @@ public final class GameWindow extends PApplet {
                 return;
             }
             pelletsEaten++;
-
+            giveExtraLife();
         }
 
         void handleDraw() {
@@ -293,6 +312,7 @@ public final class GameWindow extends PApplet {
         void increaseScore() {
             SoundManager.play(Sound.FRUIT);
             score += PacStatic.getFruitValue(typeID);
+            giveExtraLife();
         }
 
         void reset() {
