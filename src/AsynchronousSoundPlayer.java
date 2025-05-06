@@ -2,6 +2,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -26,12 +27,15 @@ final class AsynchronousSoundPlayer implements Runnable {
             case Sound.EXTRA_LIFE -> AsynchronousSoundPlayer.class.getResourceAsStream("EXTRA_LIFE.wav");
             case Sound.PAUSE -> AsynchronousSoundPlayer.class.getResourceAsStream("PAUSE.wav");
             case Sound.FRUIT -> AsynchronousSoundPlayer.class.getResourceAsStream("FRUIT.wav");
-        }; Clip clip = AudioSystem.getClip()) {
+        }) {
             assert is != null;
-            clip.open(AudioSystem.getAudioInputStream(is));
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
             while (!clip.isOpen()) ;
+            is.close();
             clip.start();
             clip.drain();
+            //clip.close();
         } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }

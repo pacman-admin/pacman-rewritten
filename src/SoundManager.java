@@ -2,12 +2,14 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.Executors.newCachedThreadPool;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 /**
  * Copyright 2024-2025 Langdon Staab
@@ -19,11 +21,40 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
  */
 final class SoundManager {
     private static final Logger LOGGER = LoggerFactory.createLogger(SoundManager.class.getName());
-    private static final ThreadPoolExecutor soundPlayer = (ThreadPoolExecutor) newFixedThreadPool(5);
+    private static final ExecutorService soundPlayer = newCachedThreadPool();
+    private static final ExecutorService wakaHandler = newSingleThreadExecutor();
     private static Clip pauseBeat;
     private static Clip wa;
     private static Clip ka;
     private static boolean wakaToggle = true;
+
+    static void stopPauseBeat() {
+        pauseBeat.close();
+        LOGGER.info("Pause beat stopped");
+    }
+
+    static void closeAll() {
+        System.out.println("Closing resources...");
+        System.err.println("Closing resources...");
+        LOGGER.info("Closing resources...");
+        closeSounds();
+        soundPlayer.shutdown();
+        wakaHandler.shutdown();
+        LOGGER.info("All resources closed. Goodbye!");
+    }
+
+    static void playStartSound() {
+        try (InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav"); Clip clip = AudioSystem.getClip()) {
+            assert is != null;
+            clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
+            while (!clip.isOpen()) ;
+            is.close();
+            clip.start();
+            clip.drain();
+        } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+            LOGGER.warning("Error while playing start sound\n" + e);
+        }
+    }
 
     static void closeSounds() {
         try {
@@ -47,7 +78,7 @@ final class SoundManager {
         InputStream is = SoundManager.class.getResourceAsStream(filename);
         try {
             assert is != null;
-            c.open(AudioSystem.getAudioInputStream(is));
+            c.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
             is.close();
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             LOGGER.warning("Error while loading sound\n" + e);
@@ -83,42 +114,21 @@ final class SoundManager {
     }
 
     static void waka() {
-        soundPlayer.submit(() -> {
-            if (wakaToggle) {
-                wa.setFramePosition(0);
+
+        if (wakaToggle) {
+            wakaToggle = false;
+            wakaHandler.submit(() -> {
                 wa.start();
-                wakaToggle = false;
-                return;
-            }
-            ka.setFramePosition(0);
-            ka.start();
-            wakaToggle = true;
-        });
-    }
-
-    static void stopPauseBeat() {
-        pauseBeat.close();
-        LOGGER.info("Pause beat stopped");
-    }
-
-    static void closeAll() {
-        System.out.println("Closing resources...");
-        System.err.println("Closing resources...");
-        LOGGER.info("Closing resources...");
-        closeSounds();
-        soundPlayer.shutdown();
-        LOGGER.info("All resources closed. Goodbye!");
-    }
-
-    static void playStartSound() {
-        try (InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav"); Clip clip = AudioSystem.getClip()) {
-            assert is != null;
-            clip.open(AudioSystem.getAudioInputStream(is));
-            while (!clip.isOpen()) ;
-            clip.start();
-            clip.drain();
-        } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
-            LOGGER.warning("Error while playing start sound\n" + e);
+                wa.drain();
+                wa.setFramePosition(0);
+            });
+            return;
         }
+        wakaToggle = true;
+        wakaHandler.submit(() -> {
+            ka.start();
+            ka.drain();
+            ka.setFramePosition(0);
+        });
     }
 }
