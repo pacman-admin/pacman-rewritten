@@ -11,7 +11,7 @@ import java.util.TimerTask;
  */
 abstract class ConcurrentRepeatingExecutor {
     ConcurrentRepeatingExecutor(String desc, int delay, int period) {
-        new Timer(desc).scheduleAtFixedRate(new TimerTask() {
+        new Timer(desc).schedule(new TimerTask() {
             @Override
             public void run() {
                 task();

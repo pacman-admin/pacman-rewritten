@@ -32,6 +32,7 @@ public final class GameWindow extends PApplet {
     private boolean awaitingStart = true;
     private int lives = 2;
     private int spriteNum = 0;
+    private boolean gameOver = false;
 
     public static void main(String[] ignored) {
         //SoundManager.preloadStartSound();
@@ -39,6 +40,7 @@ public final class GameWindow extends PApplet {
         PApplet.main(new String[]{"GameWindow"});
         new LoadingThread();
         Runtime.getRuntime().addShutdownHook(new Thread(SoundManager::closeAll));
+        Runtime.getRuntime().addShutdownHook(new Thread(PacStatic::saveHighScore));
         LOGGER.info("Pac-Man started");
     }
 
@@ -104,15 +106,13 @@ public final class GameWindow extends PApplet {
             void task() {
                 if (scoreIncreased) {
                     scoreIncreased = false;
-                    if (score > PacStatic.highScore) {
-                        PacStatic.highScore = score;
-                    }
                     try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
                         writer.println(PacStatic.highScore);
                         LOGGER.info("Saved high score");
                     } catch (FileNotFoundException e) {
                         LOGGER.warning("Error while saving high score\n" + e);
                     }
+
                 }
             }
         };
@@ -134,17 +134,28 @@ public final class GameWindow extends PApplet {
             first = false;
             LOGGER.info("Game started!");
         }
-
+        if (lives < 0) {
+            background(0);
+            text("GAME OVER\nScore: " + score, 13 * PacStatic.HALF_CELLWIDTH, 13 * PacStatic.HALF_CELLWIDTH);
+            return;
+        }
         image(currentMazeImg, PacStatic.CANVAS_CENTRE, PacStatic.CANVAS_CENTRE);
+        showScores();
         if (awaitingStart) {
             return;
         }
-        showScores();
+
         drawPellets();
         drawGhosts();
         showLives();
         pacman.move();
         showPacman();
+    }
+
+    public void mousePressed() {
+        if (lives < 0) {
+            lives = 2;
+        }
     }
 
     private void drawPellets() {
@@ -171,7 +182,7 @@ public final class GameWindow extends PApplet {
 
     private void showScores() {
         fill(255);
-        text("Score: " + score + "\nHIGH SCORE " + PacStatic.highScore, 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
+        text("Score: " + score + "\nHIGH SCORE " + (PacStatic.highScore = Math.max(PacStatic.highScore, score)), 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
     }
 
     private void showLives() {
