@@ -12,22 +12,42 @@ final class Pacman extends Entity {
     float mouthOpenAngle;
     private Dir nextDir;
     private boolean mouthOpening;
+    private boolean dying;
+
+    boolean isNotDying() {
+        return !dying;
+    }
+
+    private void doDieAnimation() {
+        mouthOpenAngle -= PacStatic.CHOMP_SPEED;
+        if (mouthOpenAngle <= 0) {
+            reset();
+        }
+    }
 
     void chomp() {
-        if (mouthOpening) {
+        if (!mouthOpening) {
             mouthOpenAngle += PacStatic.CHOMP_SPEED;
             if (mouthOpenAngle >= PI) {
-                mouthOpening = false;
+                mouthOpening = true;
             }
             return;
         }
         mouthOpenAngle -= PacStatic.CHOMP_SPEED;
-        if (mouthOpenAngle <= 3 * PI / 4) {
-            mouthOpening = true;
+        if (mouthOpenAngle <= 2 * PI / 3) {
+            mouthOpening = false;
         }
     }
 
+    void beginDeathAnimation() {
+        dying = true;
+    }
+
     void move() {
+        if (dying) {
+            doDieAnimation();
+            return;
+        }
         coordsX = Math.round((float) x / PacStatic.CELLWIDTH + 0.5f) - 1;
         coordsY = Math.round((float) y / PacStatic.CELLWIDTH + 0.5f) - 1;
         switch (nextDir) {
@@ -133,18 +153,13 @@ final class Pacman extends Entity {
         nextDir = Dir.LEFT;
     }
 
-    void freeze() {
-        mouthOpenAngle = (float) PI;
-        dir = Dir.STOPPED;
-        nextDir = Dir.STOPPED;
-    }
-
     void reset() {
         mouthOpenAngle = (float) PI;
         x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
         y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
         coordsX = 1;
         coordsY = 1;
+        dying = false;
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;
         mouthOpening = true;

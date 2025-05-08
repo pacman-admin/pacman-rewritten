@@ -86,8 +86,7 @@ class Ghost extends Entity {
     void move() {
         switch (dir) {
             case Dir.UP:
-                if (y < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                    y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (y < PacStatic.CELLWIDTH) y = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                 y -= Preferences.ghostSpeed;
                 coordsY = (y + PacStatic.HALF_CELLWIDTH - 1 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                 if (!PacStatic.MAP_DESIGN[coordsY - 1][coordsX]) {
@@ -101,8 +100,7 @@ class Ghost extends Entity {
                 }
                 return;
             case Dir.LEFT:
-                if (x < PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH)
-                    x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
+                if (x < PacStatic.CELLWIDTH) x = PacStatic.CELLWIDTH + PacStatic.HALF_CELLWIDTH;
                 x -= Preferences.ghostSpeed;
                 coordsX = (x + PacStatic.HALF_CELLWIDTH - 3 - (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                 if (!PacStatic.MAP_DESIGN[coordsY][coordsX - 1]) {
@@ -116,7 +114,7 @@ class Ghost extends Entity {
                 }
                 return;
             case Dir.DOWN:
-                if (y > PacStatic.CELLWIDTH * 11.5f) y = (int) (PacStatic.CELLWIDTH * 11.5f);
+                if (y > PacStatic.CELLWIDTH * 12) y = (int) (PacStatic.CELLWIDTH * 11.5f);
                 y += Preferences.ghostSpeed;
                 coordsY = (y - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                 if (!PacStatic.MAP_DESIGN[coordsY + 1][coordsX]) {
@@ -130,7 +128,7 @@ class Ghost extends Entity {
                 }
                 return;
             case Dir.RIGHT:
-                if (x > PacStatic.CELLWIDTH * 11.5f) x = (int) (PacStatic.CELLWIDTH * 11.5f);
+                if (x > PacStatic.CELLWIDTH * 12) x = (int) (PacStatic.CELLWIDTH * 11.5f);
                 x += Preferences.ghostSpeed;
                 coordsX = (x - PacStatic.HALF_CELLWIDTH + (Preferences.ghostSpeed / 3)) / PacStatic.CELLWIDTH;
                 if (!PacStatic.MAP_DESIGN[coordsY][coordsX + 1]) {
