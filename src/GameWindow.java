@@ -55,6 +55,7 @@ public final class GameWindow extends PApplet {
     }
 
     public void setup() {
+        surface.setTitle("Loading...");
         noStroke();
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
@@ -77,6 +78,7 @@ public final class GameWindow extends PApplet {
         imageMode(CENTER);
         rectMode(CENTER);
         maze_white = loadImage("maze_white.png");
+        surface.setTitle("Pac-Man " + PacStatic.VERSION);
     }
 
     private void giveExtraLife() {
@@ -154,7 +156,7 @@ public final class GameWindow extends PApplet {
         if (pacman.lives < 0) {
             LOGGER.info("Restarting game.");
             pacman.reset();
-            for(Ghost g : ghosts){
+            for (Ghost g : ghosts) {
                 g.reset();
             }
             for (Pickup p : pellets) {
