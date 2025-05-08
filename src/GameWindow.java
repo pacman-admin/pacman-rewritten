@@ -97,10 +97,10 @@ public final class GameWindow extends PApplet {
         new DelayedConcurrentExecutor("Delayed game start handler", 4500) {
             @Override
             void task() {
+                pacman.frozen = false;
                 for (Ghost g : ghosts) {
                     g.start();
                 }
-                pacman.frozen = false;
             }
         };
         if (!first) return;
@@ -154,6 +154,9 @@ public final class GameWindow extends PApplet {
         if (pacman.lives < 0) {
             LOGGER.info("Restarting game.");
             pacman.reset();
+            for(Ghost g : ghosts){
+                g.reset();
+            }
             for (Pickup p : pellets) {
                 p.reset();
             }
@@ -200,9 +203,6 @@ public final class GameWindow extends PApplet {
                     pacman.beginDeathAnimation();
                     LOGGER.info("You died!");
                     SoundManager.play(Sound.DEATH);
-                    for (Ghost ghost : ghosts) {
-                        ghost.reset();
-                    }
                     new DelayedConcurrentExecutor("Delayed post-death reset handler", 2000) {
                         void task() {
                             if (pacman.lives < 0) return;
@@ -215,8 +215,8 @@ public final class GameWindow extends PApplet {
                     };
                     return;
                 }
+                g.move();
             }
-            g.move();
             switch (g.dir) {
                 case Dir.UP -> image(g.sprites.up[spriteNum], g.x, g.y);
                 case Dir.RIGHT -> image(g.sprites.right[spriteNum], g.x, g.y);
