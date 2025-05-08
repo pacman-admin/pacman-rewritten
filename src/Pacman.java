@@ -13,15 +13,18 @@ final class Pacman extends Entity {
     private Dir nextDir;
     private boolean mouthOpening;
     private boolean dying;
+    int lives;
+    boolean frozen;
 
     boolean isNotDying() {
         return !dying;
     }
 
     private void doDieAnimation() {
-        mouthOpenAngle -= PacStatic.CHOMP_SPEED;
+        mouthOpenAngle -= PacStatic.CHOMP_SPEED / 2;
         if (mouthOpenAngle <= 0) {
-            reset();
+            lives--;
+            frozen = true;
         }
     }
 
@@ -163,5 +166,6 @@ final class Pacman extends Entity {
         dir = Dir.STOPPED;
         nextDir = Dir.STOPPED;
         mouthOpening = true;
+        frozen = false;
     }
 }

@@ -29,10 +29,8 @@ public final class GameWindow extends PApplet {
     private PImage currentMazeImg;
     private PImage maze_white;
     private PImage maze_blue;
-    private int lives;
     private int spriteNum;
     private boolean awaitingStart = true;
-    private boolean pacmanIsFrozen = true;
 
     public static void main(String[] ignored) {
         SoundManager.loopWhiteNoise();
@@ -84,19 +82,25 @@ public final class GameWindow extends PApplet {
     private void giveExtraLife() {
         if (score >= minScoreExtraLife) {
             minScoreExtraLife *= 2;
-            lives++;
+            pacman.lives++;
             SoundManager.play(Sound.EXTRA_LIFE);
         }
     }
 
     private void startGame() {
+        pacman.frozen = true;
+        pacman.lives = 2;
+        level = 0;
+        pelletsEaten = 0;
+        score = 0;
+        awaitingStart = false;
         new DelayedConcurrentExecutor("Delayed game start handler", 4500) {
             @Override
             void task() {
                 for (Ghost g : ghosts) {
                     g.start();
                 }
-                pacmanIsFrozen = false;
+                pacman.frozen = false;
             }
         };
         if (!first) return;
@@ -123,11 +127,6 @@ public final class GameWindow extends PApplet {
                 spriteNum = 0;
             }
         };
-        lives = 2;
-        level = 0;
-        pelletsEaten = 0;
-        score = 0;
-        awaitingStart = false;
         SoundManager.playStartSound();
     }
 
@@ -137,7 +136,7 @@ public final class GameWindow extends PApplet {
             first = false;
             LOGGER.info("Game started!");
         }
-        if (lives < 0) {
+        if (pacman.lives < 0) {
             background(0);
             text("GAME OVER\nScore: " + score, 13 * PacStatic.HALF_CELLWIDTH, 13 * PacStatic.HALF_CELLWIDTH);
             return;
@@ -147,12 +146,13 @@ public final class GameWindow extends PApplet {
         showLives();
         drawPellets();
         drawGhosts();
-        if (!pacmanIsFrozen) pacman.move();
+        if (!pacman.frozen) pacman.move();
         showPacman();
     }
 
     public void mousePressed() {
-        if (lives < 0) {
+        if (pacman.lives < 0) {
+            LOGGER.info("Restarting game.");
             pacman.reset();
             for (Pickup p : pellets) {
                 p.reset();
@@ -187,7 +187,7 @@ public final class GameWindow extends PApplet {
 
     private void showLives() {
         fill(255, 255, 128 + 32);
-        for (int i = 0; i < lives; i++) {
+        for (int i = 0; i < pacman.lives; i++) {
             arc((i + 1) * 20, height - PacStatic.HALF_CELLWIDTH, 16, 16, PI / 8, PI * 15 / 8);
         }
     }
@@ -205,11 +205,11 @@ public final class GameWindow extends PApplet {
                     }
                     new DelayedConcurrentExecutor("Delayed post-death reset handler", 2000) {
                         void task() {
-                            lives--;
-                            if (lives < 0) return;
+                            if (pacman.lives < 0) return;
                             for (Ghost ghost1 : ghosts) {
                                 ghost1.start();
                             }
+                            pacman.reset();
                             awaitingStart = false;
                         }
                     };
@@ -245,7 +245,7 @@ public final class GameWindow extends PApplet {
             SoundManager.waka();
             score += 10;
             if (pelletsEaten > 75) {
-                pacmanIsFrozen = true;
+                pacman.frozen = true;
                 pelletsEaten = 0;
                 level++;
                 currentMazeImg = maze_white;
@@ -305,7 +305,7 @@ public final class GameWindow extends PApplet {
                         for (Ghost g : ghosts) {
                             g.start();
                         }
-                        pacmanIsFrozen = false;
+                        pacman.frozen = false;
                     }
                 }, 2000);
                 return;
