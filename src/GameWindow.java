@@ -34,7 +34,6 @@ public final class GameWindow extends PApplet {
     private boolean awaitingStart = true;
 
     public static void main(String[] ignored) {
-        //SoundManager.preloadStartSound();
         SoundManager.loopWhiteNoise();
         PApplet.main(new String[]{"GameWindow"});
         new LoadingThread();
@@ -60,7 +59,6 @@ public final class GameWindow extends PApplet {
         noStroke();
         maze_blue = loadImage("maze_blue.png");
         image(maze_blue, 0, 0);
-        //pacman.freeze();
         currentMazeImg = maze_blue;
         ghosts = new ShowableGhost[]{new ShowableGhost(GhostType.BLINKY), new ShowableGhost(GhostType.INKY), new ShowableGhost(GhostType.PINKY)};
         int pelletCount = 0;
@@ -200,11 +198,9 @@ public final class GameWindow extends PApplet {
                     pacman.beginDeathAnimation();
                     LOGGER.info("You died!");
                     SoundManager.play(Sound.DEATH);
-                    //pacman.freeze();
                     for (Ghost ghost : ghosts) {
                         ghost.reset();
                     }
-                    //pacman.freeze();
                     new DelayedConcurrentExecutor("Delayed post-death reset handler", 2000) {
                         void task() {
                             lives--;
@@ -212,7 +208,6 @@ public final class GameWindow extends PApplet {
                             for (Ghost ghost1 : ghosts) {
                                 ghost1.start();
                             }
-                            //pacman.reset();
                             awaitingStart = false;
                         }
                     };
@@ -248,58 +243,49 @@ public final class GameWindow extends PApplet {
             SoundManager.waka();
             score += 10;
             if (pelletsEaten > 75) {
-                //pacman.freeze();
                 pelletsEaten = 0;
                 level++;
                 currentMazeImg = maze_white;
                 Timer t = new Timer("Pellet update and maze flash handler");
-                //pacman.freeze();
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_blue;
                     }
                 }, 250);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_white;
                     }
                 }, 500);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_blue;
                     }
                 }, 750);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_white;
                     }
                 }, 1000);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_blue;
                     }
                 }, 1250);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_white;
                     }
                 }, 1500);
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        //pacman.freeze();
                         currentMazeImg = maze_blue;
                         for (Pickup p : pellets) {
                             p.reset();
@@ -308,7 +294,6 @@ public final class GameWindow extends PApplet {
                             g.start();
                         }
                         pacman.reset();
-                        //pacman.freeze();
                     }
                 }, 1750);
                 return;
@@ -363,6 +348,7 @@ public final class GameWindow extends PApplet {
             fruit[5] = loadImage("galaxian.png");
             fruit[6] = loadImage("bell.png");
             fruit[7] = loadImage("key.png");
+            LOGGER.info("Loaded fruit sprites!");
         }
     }
 
@@ -381,7 +367,6 @@ public final class GameWindow extends PApplet {
         public void run() {
             switch (t) {
                 case GhostType.BLINKY:
-                    //LOGGER.info("Loading sprites for Blinky...");
                     up[0] = loadImage("ghost/blinky/up.png");
                     up[1] = loadImage("ghost/blinky/up2.png");
                     right[0] = loadImage("ghost/blinky/right.png");
@@ -393,7 +378,6 @@ public final class GameWindow extends PApplet {
                     LOGGER.info("Loaded Blinky sprites!");
                     return;
                 case GhostType.INKY:
-                    //LOGGER.info("Loading sprites for Inky...");
                     up[0] = loadImage("ghost/inky/up.png");
                     up[1] = loadImage("ghost/inky/up2.png");
                     right[0] = loadImage("ghost/inky/right.png");
@@ -405,7 +389,6 @@ public final class GameWindow extends PApplet {
                     LOGGER.info("Loaded Inky sprites!");
                     return;
                 case GhostType.PINKY:
-                    //LOGGER.info("Loading sprites for Pinky...");
                     up[0] = loadImage("ghost/pinky/up.png");
                     up[1] = loadImage("ghost/pinky/up2.png");
                     right[0] = loadImage("ghost/pinky/right.png");
