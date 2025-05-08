@@ -22,7 +22,6 @@ class Ghost extends Entity {
     }
 
     boolean isTouching(double pacX, double pacY) {
-        //return false;
         return Math.hypot(pacX - x, pacY - y) < PacStatic.HALF_CELLWIDTH;
     }
 

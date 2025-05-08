@@ -32,6 +32,7 @@ public final class GameWindow extends PApplet {
     private int lives;
     private int spriteNum;
     private boolean awaitingStart = true;
+    private boolean pacmanIsFrozen = true;
 
     public static void main(String[] ignored) {
         SoundManager.loopWhiteNoise();
@@ -95,6 +96,7 @@ public final class GameWindow extends PApplet {
                 for (Ghost g : ghosts) {
                     g.start();
                 }
+                pacmanIsFrozen = false;
             }
         };
         if (!first) return;
@@ -145,7 +147,7 @@ public final class GameWindow extends PApplet {
         showLives();
         drawPellets();
         drawGhosts();
-        pacman.move();
+        if (!pacmanIsFrozen) pacman.move();
         showPacman();
     }
 
@@ -243,9 +245,13 @@ public final class GameWindow extends PApplet {
             SoundManager.waka();
             score += 10;
             if (pelletsEaten > 75) {
+                pacmanIsFrozen = true;
                 pelletsEaten = 0;
                 level++;
                 currentMazeImg = maze_white;
+                for (Ghost g : ghosts) {
+                    g.reset();
+                }
                 Timer t = new Timer("Pellet update and maze flash handler");
                 t.schedule(new TimerTask() {
                     @Override
@@ -290,12 +296,18 @@ public final class GameWindow extends PApplet {
                         for (Pickup p : pellets) {
                             p.reset();
                         }
-                        for (Ghost g : ghosts) {
-                            g.start();
-                        }
                         pacman.reset();
                     }
                 }, 1750);
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        for (Ghost g : ghosts) {
+                            g.start();
+                        }
+                        pacmanIsFrozen = false;
+                    }
+                }, 2000);
                 return;
             }
             pelletsEaten++;

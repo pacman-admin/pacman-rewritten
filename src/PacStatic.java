@@ -21,7 +21,8 @@ class PacStatic {
     static int highScore = 0;
     static boolean scaleWasChanged = false;
     static float CHOMP_SPEED = (float) (PI / 36);
-    static void saveHighScore(){
+
+    static void saveHighScore() {
         try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
             writer.println(PacStatic.highScore);
             System.out.println("Saved high score");
@@ -29,6 +30,7 @@ class PacStatic {
             System.err.println("Error while saving high score\n" + e);
         }
     }
+
     static int getFruitID(int level) {
         switch (level) {
             case 3 -> {
