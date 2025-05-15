@@ -94,11 +94,11 @@ public final class GameWindow extends PApplet {
     }
 
     private void startGame() {
-        pacman.frozen = true;
-        pacman.lives = 2;
         level = 0;
         pelletsEaten = 0;
         score = 0;
+        pacman.lives = 2;
+        pacman.frozen = true;
         awaitingStart = true;
         new Thread(() -> {
             SoundManager.playStartSound();
@@ -217,7 +217,7 @@ public final class GameWindow extends PApplet {
     private void drawGhosts() {
         for (ShowableGhost g : ghosts) {
             if (pacman.isNotDying()) {
-                if (g.isTouching(pacman.x, pacman.y) && !awaitingStart) {
+                if (g.isTouching(pacman.x, pacman.y) && !awaitingStart && !pacman.frozen) {
                     awaitingStart = true;
                     pacman.beginDeathAnimation();
                     LOGGER.info("You died!");
