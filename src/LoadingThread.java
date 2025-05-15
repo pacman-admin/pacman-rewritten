@@ -36,7 +36,6 @@ final class LoadingThread extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        PreferencePane.launch();
         LOGGER.info("Thread finished!");
     }
 }
