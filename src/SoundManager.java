@@ -114,7 +114,6 @@ final class SoundManager {
     }
 
     static void waka() {
-
         if (wakaToggle) {
             wakaToggle = false;
             wakaHandler.submit(() -> {

@@ -99,16 +99,15 @@ public final class GameWindow extends PApplet {
         level = 0;
         pelletsEaten = 0;
         score = 0;
-        awaitingStart = false;
-        new DelayedConcurrentExecutor("Delayed game start handler", 4500) {
-            @Override
-            void task() {
-                pacman.frozen = false;
-                for (Ghost g : ghosts) {
-                    g.start();
-                }
+        awaitingStart = true;
+        new Thread(() -> {
+            SoundManager.playStartSound();
+            pacman.frozen = false;
+            for (Ghost g : ghosts) {
+                g.start();
             }
-        };
+            awaitingStart = false;
+        }).start();
         if (first) {
             new ConcurrentRepeatingExecutor("Asynchronous recorder of high score", 20000, 15000) {
                 void task() {
@@ -134,15 +133,9 @@ public final class GameWindow extends PApplet {
                 }
             };
         }
-        SoundManager.playStartSound();
     }
 
     public void draw() {
-        if (first) {
-            startGame();
-            first = false;
-            LOGGER.info("Game started!");
-        }
         if (pacman.lives < 0) {
             background(0);
             text("GAME OVER\nScore: " + score, 13 * PacStatic.HALF_CELLWIDTH, 13 * PacStatic.HALF_CELLWIDTH);
@@ -156,6 +149,11 @@ public final class GameWindow extends PApplet {
         drawButtons();
         if (!pacman.frozen) pacman.move();
         showPacman();
+        if (first) {
+            startGame();
+            first = false;
+            LOGGER.info("Game started!");
+        }
     }
 
     public void mousePressed() {
@@ -168,7 +166,10 @@ public final class GameWindow extends PApplet {
             for (Pickup p : pellets) {
                 p.reset();
             }
+            LOGGER.info("bla");
+            draw();
             startGame();
+            LOGGER.info("Game restarted.");
             return;
         }
 
