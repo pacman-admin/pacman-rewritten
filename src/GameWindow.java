@@ -31,6 +31,8 @@ public final class GameWindow extends PApplet {
     private PImage maze_blue;
     private int spriteNum;
     private boolean awaitingStart = true;
+    private PImage preferencesButton;
+    private PImage restartButton;
 
     public static void main(String[] ignored) {
         SoundManager.loopWhiteNoise();
@@ -58,6 +60,8 @@ public final class GameWindow extends PApplet {
         surface.setTitle("Loading...");
         noStroke();
         maze_blue = loadImage("maze_blue.png");
+        preferencesButton = loadImage("preferences.png");
+        restartButton = loadImage("restart.png");
         image(maze_blue, 0, 0);
         currentMazeImg = maze_blue;
         ghosts = new ShowableGhost[]{new ShowableGhost(GhostType.BLINKY), new ShowableGhost(GhostType.INKY), new ShowableGhost(GhostType.PINKY)};
@@ -105,30 +109,31 @@ public final class GameWindow extends PApplet {
                 }
             }
         };
-        if (!first) return;
-        new ConcurrentRepeatingExecutor("Asynchronous recorder of high score", 20000, 15000) {
-            void task() {
-                if (scoreIncreased) {
-                    scoreIncreased = false;
-                    try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
-                        writer.println(PacStatic.highScore);
-                        LOGGER.info("Saved high score");
-                    } catch (FileNotFoundException e) {
-                        LOGGER.warning("Error while saving high score\n" + e);
-                    }
+        if (first) {
+            new ConcurrentRepeatingExecutor("Asynchronous recorder of high score", 20000, 15000) {
+                void task() {
+                    if (scoreIncreased) {
+                        scoreIncreased = false;
+                        try (PrintWriter writer = new PrintWriter(PacStatic.PATH + "/highscore.txt")) {
+                            writer.println(PacStatic.highScore);
+                            LOGGER.info("Saved high score");
+                        } catch (FileNotFoundException e) {
+                            LOGGER.warning("Error while saving high score\n" + e);
+                        }
 
+                    }
                 }
-            }
-        };
-        new ConcurrentRepeatingExecutor("Asynchronous ghost sprite toggler", 4500, 320) {
-            void task() {
-                if (spriteNum == 0) {
-                    spriteNum = 1;
-                    return;
+            };
+            new ConcurrentRepeatingExecutor("Asynchronous ghost sprite toggler", 4500, 320) {
+                void task() {
+                    if (spriteNum == 0) {
+                        spriteNum = 1;
+                        return;
+                    }
+                    spriteNum = 0;
                 }
-                spriteNum = 0;
-            }
-        };
+            };
+        }
         SoundManager.playStartSound();
     }
 
@@ -148,12 +153,13 @@ public final class GameWindow extends PApplet {
         showLives();
         drawPellets();
         drawGhosts();
+        drawButtons();
         if (!pacman.frozen) pacman.move();
         showPacman();
     }
 
     public void mousePressed() {
-        if (pacman.lives < 0) {
+        if (pacman.lives < 0 || Math.hypot(mouseX - PacStatic.CELLWIDTH * 4.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH) {
             LOGGER.info("Restarting game.");
             pacman.reset();
             for (Ghost g : ghosts) {
@@ -163,6 +169,11 @@ public final class GameWindow extends PApplet {
                 p.reset();
             }
             startGame();
+            return;
+        }
+
+        if (Math.hypot(mouseX - PacStatic.CELLWIDTH * 5.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH) {
+            PreferencePane.launch();
         }
     }
 
@@ -188,6 +199,11 @@ public final class GameWindow extends PApplet {
     private void showScores() {
         fill(255);
         text("Score: " + score + "\nHIGH SCORE " + (PacStatic.highScore = Math.max(PacStatic.highScore, score)), 13 * PacStatic.HALF_CELLWIDTH, PacStatic.HALF_CELLWIDTH);
+    }
+
+    private void drawButtons() {
+        image(preferencesButton, PacStatic.CELLWIDTH * 5.5f, PacStatic.CELLWIDTH * 11.5f);
+        image(restartButton, PacStatic.CELLWIDTH * 4.5f, PacStatic.CELLWIDTH * 11.5f);
     }
 
     private void showLives() {
