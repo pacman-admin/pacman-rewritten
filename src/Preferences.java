@@ -30,6 +30,7 @@ class Preferences {
         new Thread(() -> {
             SoundManager.preload();
             mute = false;
+            save();
         }).start();
     }
 
