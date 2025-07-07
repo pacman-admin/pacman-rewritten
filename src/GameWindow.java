@@ -163,10 +163,10 @@ public final class GameWindow extends PApplet {
             for (Ghost g : ghosts) {
                 g.reset();
             }
+            level = 0;
             for (Pickup p : pellets) {
                 p.reset();
             }
-            LOGGER.info("bla");
             draw();
             startGame();
             LOGGER.info("Game restarted.");

@@ -10,11 +10,11 @@ import static java.lang.Math.PI;
  */
 final class Pacman extends Entity {
     float mouthOpenAngle;
+    int lives;
+    boolean frozen;
     private Dir nextDir;
     private boolean mouthOpening;
     private boolean dying;
-    int lives;
-    boolean frozen;
 
     boolean isNotDying() {
         return !dying;
@@ -43,7 +43,7 @@ final class Pacman extends Entity {
     }
 
     void beginDeathAnimation() {
-        dying = true;
+        if (!frozen) dying = true;
     }
 
     void move() {
