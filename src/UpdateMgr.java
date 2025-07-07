@@ -22,7 +22,7 @@ final class UpdateMgr {
     static void checkForUpdate() {
         LOGGER.info("Checking for update...");
         try {
-            URI versionF = new URI("https://www3.langdonstaab.ca");
+            URI versionF = new URI("https://raw.githubusercontent.com/pacman-admin/pacman-rewritten/refs/heads/master/version");
             BufferedReader in = new BufferedReader(new InputStreamReader(versionF.toURL().openStream()));
             latestVersion = parseFloat(in.readLine());
             in.close();
