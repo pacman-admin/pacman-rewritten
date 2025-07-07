@@ -16,8 +16,8 @@ final class Pacman extends Entity {
     private boolean mouthOpening;
     private boolean dying;
 
-    boolean isNotDying() {
-        return !dying;
+    boolean isAlive() {
+        return !(dying || frozen);
     }
 
     private void doDieAnimation() {

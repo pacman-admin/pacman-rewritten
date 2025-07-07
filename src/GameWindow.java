@@ -216,7 +216,7 @@ public final class GameWindow extends PApplet {
 
     private void drawGhosts() {
         for (ShowableGhost g : ghosts) {
-            if (pacman.isNotDying()) {
+            if (pacman.isAlive()) {
                 if (g.isTouching(pacman.x, pacman.y) && !awaitingStart && !pacman.frozen) {
                     awaitingStart = true;
                     pacman.beginDeathAnimation();
