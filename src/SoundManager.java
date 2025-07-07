@@ -44,13 +44,16 @@ final class SoundManager {
     }
 
     static void playStartSound() {
+        LOGGER.info("Starting playback of game start sound...");
         try (InputStream is = SoundManager.class.getResourceAsStream("GAME_START.wav"); Clip clip = AudioSystem.getClip()) {
             assert is != null;
             clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(is)));
             while (!clip.isOpen()) ;
             is.close();
             clip.start();
+            LOGGER.info("Start sound is playing...");
             clip.drain();
+            LOGGER.info("Start sound finished");
         } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
             LOGGER.warning("Error while playing start sound\n" + e);
         }
