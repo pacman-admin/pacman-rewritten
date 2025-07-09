@@ -12,7 +12,7 @@ import static java.lang.Math.PI;
  * @author Langdon Staab
  */
 class PacStatic {
-    final static float VERSION = 14.2f;
+    final static float VERSION = 14.3f;
     final static String PATH = System.getProperty("user.home");
     final static int CELLWIDTH = 32;
     final static int HALF_CELLWIDTH = 16;
