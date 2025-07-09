@@ -1,8 +1,9 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 
 import static java.lang.Float.parseFloat;
@@ -44,5 +45,18 @@ final class UpdateMgr {
 
     static float getLatestVersion() {
         return latestVersion;
+    }
+
+    static void installUpdate() throws IOException, URISyntaxException {
+        InputStream in = new URI("https://raw.githubusercontent.com/pacman-admin/GNU-Linux-downloads/refs/heads/main/Pac-Man_redo.jar").toURL().openStream();
+        Files.copy(in, Paths.get(PacStatic.PATH + "pacman.jar"), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private static String getAppPath() {
+        try {
+            return new File(PacStatic.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -82,6 +82,17 @@ abstract class Window extends JPanel implements ActionListener {
                 } catch (IOException | URISyntaxException ex) {
                     throw new RuntimeException("Error opening popup in browser", ex);
                 }
+                return;
+            case "install":
+                try {
+                    UpdateMgr.installUpdate();
+                } catch (IOException ex) {
+                    LOGGER.warning("Could not install update. Encountered an IOException.\nPlease check your internet connection.\n" + e);
+                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease check your internet connection.");
+                } catch (URISyntaxException ex) {
+                    LOGGER.warning("Could not install update. Encountered a URISyntaxException.\nPlease download the latest version from www.langdonstaab.ca\n" + e);
+                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease manually download the latest version from www.langdonstaab.ca");
+                }
         }
     }
 }

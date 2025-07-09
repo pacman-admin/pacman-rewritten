@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Copyright 2024-2025 Langdon Staab
@@ -25,11 +26,6 @@ public class UpdateNotificationPane extends Window {
         p.add(new JLabel("A new Version of Pac-Man has been released!"));
         p.add(new JLabel("Current Version: " + PacStatic.VERSION));
         p.add(new JLabel("New Version: " + UpdateMgr.getLatestVersion()));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
-        p.add(new JLabel(""));
+        p.add(createButton("Install Update", KeyEvent.VK_I, "install"));
     }
 }

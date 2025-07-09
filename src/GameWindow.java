@@ -58,6 +58,7 @@ public final class GameWindow extends PApplet {
 
     public void setup() {
         surface.setTitle("Loading...");
+        //LOGGER.info(PacStatic.getAppPath());
         noStroke();
         maze_blue = loadImage("maze_blue.png");
         preferencesButton = loadImage("preferences.png");
