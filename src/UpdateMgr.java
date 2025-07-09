@@ -25,8 +25,10 @@ final class UpdateMgr {
         try {
             URI versionF = new URI("https://raw.githubusercontent.com/pacman-admin/pacman-rewritten/refs/heads/master/version");
             BufferedReader in = new BufferedReader(new InputStreamReader(versionF.toURL().openStream()));
-            latestVersion = parseFloat(in.readLine());
+            String s = in.readLine();
+            latestVersion = parseFloat(s);
             LOGGER.info("Latest version is: " + latestVersion);
+            LOGGER.info("Latest version is: " + s);
             in.close();
         } catch (IOException e) {
             LOGGER.warning("Encountered an IOException while checking for an update. Please check your internet connection.");
