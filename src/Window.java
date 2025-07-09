@@ -92,7 +92,7 @@ abstract class Window extends JPanel implements ActionListener {
                     return;
                 } catch (Exception ex) {
                     LOGGER.warning("Could not install update. \nPlease download the latest version from www.langdonstaab.ca\n" + ex);
-                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease manually download the latest version from www.langdonstaab.ca", "Could not install update", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease manually download the latest version from www.langdonstaab.ca\n"+ex, "Could not install update", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 JOptionPane.showMessageDialog(null, "Successfully installed the latest available version!\nPlease restart Pac-Man to use the latest version.", "Update Successful!", JOptionPane.PLAIN_MESSAGE);
