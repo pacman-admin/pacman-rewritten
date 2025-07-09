@@ -52,7 +52,7 @@ final class UpdateMgr {
 
     static void installUpdate() throws IOException, URISyntaxException {
         InputStream in = new URI("https://raw.githubusercontent.com/pacman-admin/GNU-Linux-downloads/refs/heads/main/Pac-Man_redo.jar").toURL().openStream();
-        Files.copy(in, Paths.get(PacStatic.PATH + "pacman.jar"), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(in, Paths.get(PacStatic.PATH + "/pacman.jar"), StandardCopyOption.REPLACE_EXISTING);
     }
 
     private static String getAppPath() {

@@ -87,12 +87,15 @@ abstract class Window extends JPanel implements ActionListener {
                 try {
                     UpdateMgr.installUpdate();
                 } catch (IOException ex) {
-                    LOGGER.warning("Could not install update. Encountered an IOException.\nPlease check your internet connection.\n" + e);
-                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease check your internet connection.");
-                } catch (URISyntaxException ex) {
-                    LOGGER.warning("Could not install update. Encountered a URISyntaxException.\nPlease download the latest version from www.langdonstaab.ca\n" + e);
-                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease manually download the latest version from www.langdonstaab.ca");
+                    LOGGER.warning("Could not install update. Encountered an IOException.\nPlease check your internet connection.\n" + ex);
+                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease check your internet connection.", "Could not install update", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (Exception ex) {
+                    LOGGER.warning("Could not install update. \nPlease download the latest version from www.langdonstaab.ca\n" + ex);
+                    JOptionPane.showMessageDialog(null, "Could not download latest jar file.\nPlease manually download the latest version from www.langdonstaab.ca", "Could not install update", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
+                JOptionPane.showMessageDialog(null, "Successfully installed the latest available version!\nPlease restart Pac-Man to use the latest version.", "Update Successful!", JOptionPane.PLAIN_MESSAGE);
         }
     }
 }
