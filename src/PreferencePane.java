@@ -95,7 +95,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                 Preferences.playPauseBeat = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             default:
-                LOGGER.severe("An unknown checkbox was selected/deselected!");
+                LOGGER.severe("An unknown checkbox was selected/deselected");
                 return;
         }
         Preferences.save();
@@ -116,7 +116,7 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                     Preferences.ghostSpeed = source.getValue();
                     break;
                 default:
-                    LOGGER.severe("An unknown slider was adjusted!");
+                    LOGGER.severe("An unknown slider was adjusted");
                     return;
             }
             Preferences.save();

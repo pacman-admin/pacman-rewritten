@@ -20,7 +20,7 @@ import java.awt.event.KeyEvent;
  */
 public class UpdateNotificationPane extends Window {
     private UpdateNotificationPane() {
-        title = "A New Update is Available!";
+        title = "New Update Available";
     }
 
     private static void runInit() {
@@ -32,7 +32,7 @@ public class UpdateNotificationPane extends Window {
     }
 
     final void main(JPanel p) {
-        p.add(new JLabel("A new Version of Pac-Man has been released!"));
+        p.add(new JLabel("A new Version of Pac-Man has been released"));
         p.add(new JLabel("Current Version: " + PacStatic.VERSION));
         p.add(new JLabel("New Version: " + UpdateMgr.getLatestVersion()));
         p.add(createButton("Install Update", KeyEvent.VK_I, "install"));

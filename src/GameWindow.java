@@ -42,6 +42,7 @@ public final class GameWindow extends PApplet {
     private boolean awaitingStart = true;
     private PImage preferencesButton;
     private PImage restartButton;
+    private static boolean paused = false;
 
     public static void main(String[] ignored) {
         SoundManager.loopWhiteNoise();
@@ -67,12 +68,11 @@ public final class GameWindow extends PApplet {
 
     public void setup() {
         surface.setTitle("Loading...");
-        //LOGGER.info(PacStatic.getAppPath());
         noStroke();
         maze_blue = loadImage("maze_blue.png");
+        image(maze_blue, 0, 0);
         preferencesButton = loadImage("preferences.png");
         restartButton = loadImage("restart.png");
-        image(maze_blue, 0, 0);
         currentMazeImg = maze_blue;
         ghosts = new ShowableGhost[]{new ShowableGhost(GhostType.BLINKY), new ShowableGhost(GhostType.INKY), new ShowableGhost(GhostType.PINKY)};
         int pelletCount = 0;
@@ -97,9 +97,10 @@ public final class GameWindow extends PApplet {
 
     private void giveExtraLife() {
         if (score >= minScoreExtraLife) {
-            minScoreExtraLife *= 2;
+            minScoreExtraLife <<= 2;
             pacman.lives++;
             SoundManager.play(Sound.EXTRA_LIFE);
+            LOGGER.info(""+minScoreExtraLife);
         }
     }
 
@@ -162,30 +163,44 @@ public final class GameWindow extends PApplet {
         if (first) {
             startGame();
             first = false;
-            LOGGER.info("Game started!");
+            LOGGER.info("Game started");
         }
     }
-
+    private void restartGame(){
+        LOGGER.info("Restarting game.");
+        pacman.reset();
+        for (Ghost g : ghosts) {
+            g.reset();
+        }
+        level = 0;
+        for (Pickup p : pellets) {
+            p.reset();
+        }
+        draw();
+        startGame();
+        LOGGER.info("Game restarted.");
+    }
     public void mousePressed() {
-        if (pacman.lives < 0 || Math.hypot(mouseX - PacStatic.CELLWIDTH * 4.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH) {
-            LOGGER.info("Restarting game.");
-            pacman.reset();
-            for (Ghost g : ghosts) {
-                g.reset();
-            }
-            level = 0;
-            for (Pickup p : pellets) {
-                p.reset();
-            }
-            draw();
-            startGame();
-            LOGGER.info("Game restarted.");
+        if (pacman.lives < 0) {
+            restartGame();
             return;
         }
-
+        if(Math.hypot(mouseX - PacStatic.CELLWIDTH * 4.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH){
+            restartGame();
+            return;
+        }
         if (Math.hypot(mouseX - PacStatic.CELLWIDTH * 5.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH) {
             PreferencePane.launch();
+            return;
         }
+        paused = !paused;
+        if(paused){
+            noLoop();
+            SoundManager.loopPauseBeat();
+            return;
+        }
+        loop();
+        SoundManager.stopPauseBeat();
     }
 
     private void drawPellets() {
@@ -230,13 +245,13 @@ public final class GameWindow extends PApplet {
                 if (g.isTouching(pacman.x, pacman.y) && !awaitingStart && !pacman.frozen) {
                     awaitingStart = true;
                     pacman.beginDeathAnimation();
-                    LOGGER.info("You died!");
+                    LOGGER.info("You died");
                     SoundManager.play(Sound.DEATH);
                     new DelayedConcurrentExecutor() {
                         void task() {
                             if (pacman.lives < 0) return;
-                            for (Ghost ghost1 : ghosts) {
-                                ghost1.start();
+                            for (Ghost ghost : ghosts) {
+                                ghost.start();
                             }
                             pacman.reset();
                             awaitingStart = false;
@@ -256,11 +271,11 @@ public final class GameWindow extends PApplet {
     }
 
     private final class ShowableGhost extends Ghost {
-        private final GameWindow.GhostSpriteContainer sprites;
+        private final GhostSpriteContainer sprites;
 
         ShowableGhost(GhostType gT) {
             super(gT);
-            sprites = new GameWindow.GhostSpriteContainer(gT);
+            sprites = new GhostSpriteContainer(gT);
         }
     }
 
@@ -389,7 +404,7 @@ public final class GameWindow extends PApplet {
             fruit[5] = loadImage("galaxian.png");
             fruit[6] = loadImage("bell.png");
             fruit[7] = loadImage("key.png");
-            LOGGER.info("Loaded fruit sprites!");
+            LOGGER.info("Loaded fruit sprites");
         }
     }
 
@@ -416,7 +431,7 @@ public final class GameWindow extends PApplet {
                     down[1] = loadImage("ghost/blinky/down2.png");
                     left[0] = loadImage("ghost/blinky/left.png");
                     left[1] = loadImage("ghost/blinky/left2.png");
-                    LOGGER.info("Loaded Blinky sprites!");
+                    LOGGER.info("Loaded Blinky sprites");
                     return;
                 case GhostType.INKY:
                     up[0] = loadImage("ghost/inky/up.png");
@@ -427,7 +442,7 @@ public final class GameWindow extends PApplet {
                     down[1] = loadImage("ghost/inky/down2.png");
                     left[0] = loadImage("ghost/inky/left.png");
                     left[1] = loadImage("ghost/inky/left2.png");
-                    LOGGER.info("Loaded Inky sprites!");
+                    LOGGER.info("Loaded Inky sprites");
                     return;
                 case GhostType.PINKY:
                     up[0] = loadImage("ghost/pinky/up.png");
@@ -438,7 +453,7 @@ public final class GameWindow extends PApplet {
                     down[1] = loadImage("ghost/pinky/down2.png");
                     left[0] = loadImage("ghost/pinky/left.png");
                     left[1] = loadImage("ghost/pinky/left2.png");
-                    LOGGER.info("Loaded Pinky sprites!");
+                    LOGGER.info("Loaded Pinky sprites");
             }
         }
     }

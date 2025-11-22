@@ -50,7 +50,7 @@ final class UpdateMgr {
             return;
         }
         if (PacStatic.VERSION < latestVersion) {
-            LOGGER.info("An update is available!");
+            LOGGER.info("An update is available");
             //create update window
             UpdateNotificationPane.launch();
         }

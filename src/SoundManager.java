@@ -43,13 +43,12 @@ final class SoundManager {
     }
 
     static void closeAll() {
-        System.out.println("Closing resources...");
-        System.err.println("Closing resources...");
         LOGGER.info("Closing resources...");
+        System.out.println("Closing resources...");
         closeSounds();
         soundPlayer.shutdown();
         wakaHandler.shutdown();
-        LOGGER.info("All resources closed. Goodbye!");
+        System.out.println("All resources closed");
     }
 
     static void playStartSound() {
@@ -107,9 +106,11 @@ final class SoundManager {
     }
 
     static void loopPauseBeat() {
-        openClip(pauseBeat, "PAUSE_BEAT.wav");
-        pauseBeat.loop(Clip.LOOP_CONTINUOUSLY);
-        LOGGER.info("Pause beat started");
+        if(Preferences.playPauseBeat) {
+            openClip(pauseBeat, "PAUSE_BEAT.wav");
+            pauseBeat.loop(Clip.LOOP_CONTINUOUSLY);
+            LOGGER.info("Pause beat started");
+        }
     }
 
     static void preload() {
@@ -119,7 +120,7 @@ final class SoundManager {
             pauseBeat = AudioSystem.getClip();
         } catch (LineUnavailableException e) {
             Preferences.mute();
-            throw new RuntimeException("Line Unavailable!" + e, e);
+            throw new RuntimeException("Line Unavailable" + e, e);
         }
         openClip(wa, "DOT_1.wav");
         openClip(ka, "DOT_2.wav");

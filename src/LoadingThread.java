@@ -45,6 +45,6 @@ final class LoadingThread extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        LOGGER.info("Thread finished!");
+        LOGGER.info("Thread finished");
     }
 }

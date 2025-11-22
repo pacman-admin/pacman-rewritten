@@ -31,7 +31,7 @@ class NoUpdateNecessaryNP extends Window {
     }
 
     final void main(JPanel p) {
-        p.add(new JLabel("You already have the latest version!"));
+        p.add(new JLabel("You already have the latest version"));
         p.add(new JLabel("Pac-Man version " + PacStatic.VERSION));
     }
 }
