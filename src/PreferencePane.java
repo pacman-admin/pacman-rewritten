@@ -74,15 +74,15 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
     public void itemStateChanged(ItemEvent e) {
         switch (checkBoxes.indexOf((JCheckBox) e.getItemSelectable())) {
             case 0:
-                LOGGER.info("Clicked checkBox 1");
+                LOGGER.fine("Clicked checkBox 1");
                 Preferences.autoUpdate = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             case 1:
-                LOGGER.info("Clicked checkBox 2");
+                LOGGER.fine("Clicked checkBox 2");
                 Preferences.debug = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             case 2:
-                LOGGER.info("Clicked checkBox 3");
+                LOGGER.fine("Clicked checkBox 3");
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Preferences.mute();
                     checkBoxes.get(3).setSelected(false);
@@ -91,14 +91,13 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                 Preferences.unMute();
                 break;
             case 3:
-                LOGGER.info("Clicked checkBox 4");
+                LOGGER.fine("Clicked checkBox 4");
                 Preferences.playPauseBeat = e.getStateChange() == ItemEvent.SELECTED;
                 break;
             default:
                 LOGGER.severe("An unknown checkbox was selected/deselected!");
                 return;
         }
-        System.out.println(checkBoxes.indexOf((JCheckBox) e.getItemSelectable()) + ", " + (e.getStateChange() == ItemEvent.SELECTED));
         Preferences.save();
     }
 
@@ -120,7 +119,6 @@ class PreferencePane extends Window implements ItemListener, ChangeListener {
                     LOGGER.severe("An unknown slider was adjusted!");
                     return;
             }
-            System.out.println(sliders.indexOf(source) + ", " + source.getValue());
             Preferences.save();
         }
     }
