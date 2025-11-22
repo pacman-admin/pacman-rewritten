@@ -27,7 +27,7 @@ import static java.lang.Float.parseFloat;
  */
 final class UpdateMgr {
     private static final Logger LOGGER = LoggerFactory.createLogger(UpdateMgr.class.getName());
-    private static float latestVersion = 14f;
+    private static float latestVersion = PacStatic.VERSION;
 
     static void checkForUpdate() {
         LOGGER.info("Checking for update...");
@@ -35,10 +35,11 @@ final class UpdateMgr {
             URI versionF = new URI("https://raw.githubusercontent.com/pacman-admin/pacman-rewritten/refs/heads/master/version");
             BufferedReader in = new BufferedReader(new InputStreamReader(versionF.toURL().openStream()));
             String s = in.readLine();
+            in.close();
             latestVersion = parseFloat(s);
             LOGGER.info("Latest version is: " + latestVersion);
             LOGGER.info("Latest version is: " + s);
-            in.close();
+
         } catch (IOException e) {
             LOGGER.warning("Encountered an IOException while checking for an update. Please check your internet connection.");
             LOGGER.warning(e.toString());
@@ -61,8 +62,7 @@ final class UpdateMgr {
 
     static void installUpdate() throws IOException, URISyntaxException {
         InputStream in = new URI("https://raw.githubusercontent.com/pacman-admin/GNU-Linux-downloads/refs/heads/main/Pac-Man_redo.jar").toURL().openStream();
-        Files.copy(in, Paths.get(getAppPath()), StandardCopyOption.REPLACE_EXISTING);
-        //Files.copy(in, Paths.get(getAppPath()));
+        Files.copy(new BufferedInputStream(in), Paths.get(getAppPath()), StandardCopyOption.REPLACE_EXISTING);
     }
 
     private static String getAppPath() {
