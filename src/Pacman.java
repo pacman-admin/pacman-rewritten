@@ -40,9 +40,7 @@ final class Pacman extends Entity {
     void chomp() {
         if (!mouthOpening) {
             mouthOpenAngle += PacStatic.CHOMP_SPEED;
-            if (mouthOpenAngle >= PI) {
-                mouthOpening = true;
-            }
+            mouthOpening = mouthOpenAngle >= PI;
             return;
         }
         mouthOpenAngle -= PacStatic.CHOMP_SPEED;
@@ -51,8 +49,7 @@ final class Pacman extends Entity {
         }
     }
 
-    void beginDeathAnimation() {
-        if (!frozen) dying = true;
+    void beginDeathAnimation() { dying |= !frozen;
     }
 
     void move() {
