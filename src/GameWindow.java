@@ -7,13 +7,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-/*
+/**
  * Copyright (c) 2025 Langdon Staab <pacman@langdonstaab.ca>
- *
+ * <p>
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -21,6 +21,8 @@ import java.util.logging.Logger;
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * @author Langdon Staab
  */
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
@@ -86,7 +88,7 @@ public final class GameWindow extends PApplet {
         }
         textAlign(CENTER, CENTER);
         textFont(createFont("minecraft-seven-classic/minecraft-seven-classic.ttf", 8, false));
-        pellets[77] = new Fruit(7, 1);
+        pellets[77] = new Fruit();
         imageMode(CENTER);
         rectMode(CENTER);
         maze_white = loadImage("maze_white.png");
@@ -230,7 +232,7 @@ public final class GameWindow extends PApplet {
                     pacman.beginDeathAnimation();
                     LOGGER.info("You died!");
                     SoundManager.play(Sound.DEATH);
-                    new DelayedConcurrentExecutor("Delayed post-death reset handler", 2000) {
+                    new DelayedConcurrentExecutor() {
                         void task() {
                             if (pacman.lives < 0) return;
                             for (Ghost ghost1 : ghosts) {
@@ -350,8 +352,8 @@ public final class GameWindow extends PApplet {
         private static int typeID = 0;
         private final FruitSpriteContainer sprites;
 
-        private Fruit(int cellCol, int cellRow) {
-            super(cellCol, cellRow);
+        private Fruit() {
+            super(7, 1);
             sprites = new FruitSpriteContainer();
         }
 
