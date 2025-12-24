@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 public final class GameWindow extends PApplet {
     private static final Logger LOGGER = LoggerFactory.createLogger(GameWindow.class.getName());
     private static int minScoreExtraLife = 1000;
+    private static boolean paused = false;
     private final Pickup[] pellets = new Pickup[78];
     private final Pacman pacman = new Pacman();
     private ShowableGhost[] ghosts;
@@ -42,7 +43,6 @@ public final class GameWindow extends PApplet {
     private boolean awaitingStart = true;
     private PImage preferencesButton;
     private PImage restartButton;
-    private static boolean paused = false;
 
     public static void main(String[] ignored) {
         SoundManager.loopWhiteNoise();
@@ -100,7 +100,7 @@ public final class GameWindow extends PApplet {
             minScoreExtraLife <<= 2;
             pacman.lives++;
             SoundManager.play(Sound.EXTRA_LIFE);
-            LOGGER.info(""+minScoreExtraLife);
+            LOGGER.info("" + minScoreExtraLife);
         }
     }
 
@@ -166,7 +166,8 @@ public final class GameWindow extends PApplet {
             LOGGER.info("Game started");
         }
     }
-    private void restartGame(){
+
+    private void restartGame() {
         LOGGER.info("Restarting game.");
         pacman.reset();
         for (Ghost g : ghosts) {
@@ -180,12 +181,13 @@ public final class GameWindow extends PApplet {
         startGame();
         LOGGER.info("Game restarted.");
     }
+
     public void mousePressed() {
         if (pacman.lives < 0) {
             restartGame();
             return;
         }
-        if(Math.hypot(mouseX - PacStatic.CELLWIDTH * 4.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH){
+        if (Math.hypot(mouseX - PacStatic.CELLWIDTH * 4.5, mouseY - PacStatic.CELLWIDTH * 11.5) < PacStatic.HALF_CELLWIDTH) {
             restartGame();
             return;
         }
@@ -194,7 +196,7 @@ public final class GameWindow extends PApplet {
             return;
         }
         paused = !paused;
-        if(paused){
+        if (paused) {
             noLoop();
             SoundManager.loopPauseBeat();
             return;
